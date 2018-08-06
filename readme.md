@@ -2,8 +2,7 @@
 
 **Table of Contents**
 
-- [Getting Started with After.js](#getting-started-with-afterjs)
-  - [Razzle Quickstart](#razzle-quickstart)
+- [Getting Started with Before.js](#getting-started-with-Beforejs)
 - [Data Fetching](#data-fetching)
   - [`getInitialProps: (ctx) => Data`](#getinitialprops-ctx--data)
   - [Injected Page Props](#injected-page-props)
@@ -13,22 +12,9 @@
 - [Code Splitting](#code-splitting)
 - [Custom `<Document>`](#custom-document)
 
-## Getting Started with After.js
+## Getting Started with Before.js
 
-After.js enables Next.js-like data fetching with any React SSR app that uses React Router 4.
-
-### Razzle Quickstart
-
-You can quickly bootstrap an SSR React app with After.js using Razzle. While Razzle is not required, this documentation assumes you have the tooling setup for an isomorphic React application.
-
-```bash
-yarn global add create-razzle-app
-create-razzle-app --example with-afterjs myapp
-cd myapp
-yarn start
-```
-
-Refer to [Razzle's](https://github.com/jaredpalmer/razzle) docs for tooling, babel, and webpack customization.
+Before.js enables Next.js-like data fetching with any React SSR app that uses React Router 4.
 
 ## Data Fetching
 
@@ -81,7 +67,7 @@ the client and the server:
 
 ## Routing
 
-As you have probably figured out, React Router 4 powers all of After.js's
+As you have probably figured out, React Router 4 powers all of Before.js's
 routing. You can use any and all parts of RR4.
 
 ### Parameterized Routing
@@ -146,19 +132,19 @@ export default Detail;
 ### Client Only Data and Routing
 
 In some parts of your application, you may not need server data fetching at all
-(e.g. settings). With After.js, you just use React Router 4 as you normally
+(e.g. settings). With Before.js, you just use React Router 4 as you normally
 would in client land: You can fetch data (in componentDidMount) and do routing
 the same exact way.
 
 ## Code Splitting
 
-After.js lets you easily define lazy-loaded or code-split routes in your `_routes.js` file. To do this, you'll need to modify the relevant route's `component` definition like so:
+Before.js lets you easily define lazy-loaded or code-split routes in your `_routes.js` file. To do this, you'll need to modify the relevant route's `component` definition like so:
 
 ```js
 // ./src/_routes.js
 import React from 'react';
 import Home from './Home';
-import { asyncComponent } from '@jaredpalmer/after';
+import { asyncComponent } from '@flybondi/Before';
 
 export default [
   // normal route
@@ -181,12 +167,11 @@ export default [
 
 ## Custom `<Document>`
 
-After.js works similarly to Next.js with respect to overriding HTML document structure. This comes in handy if you are using a CSS-in-JS library or just want to collect data out of react context before or after render. To do this, create a file in `./src/Document.js` like so:
+Before.js works similarly to Next.js with respect to overriding HTML document structure. This comes in handy if you are using a CSS-in-JS library or just want to collect data out of react context before or Before render. To do this, create a file in `./src/Document.js` like so:
 
 ```js
 // ./src/Document.js
 import React from 'react';
-import { AfterRoot, AfterData } from '@jaredpalmer/after';
 
 class Document extends React.Component {
   static async getInitialProps({ assets, data, renderPage }) {
@@ -195,7 +180,7 @@ class Document extends React.Component {
   }
 
   render() {
-    const { helmet, assets, data } = this.props;
+    const { helmet, assets, data, title } = this.props;
     // get attributes from React Helmet
     const htmlAttrs = helmet.htmlAttributes.toComponent();
     const bodyAttrs = helmet.bodyAttributes.toComponent();
@@ -205,7 +190,7 @@ class Document extends React.Component {
         <head>
           <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
           <meta charSet="utf-8" />
-          <title>Welcome to the Afterparty</title>
+          <title>{title}</title>
           <meta name="viewport" content="width=device-width, initial-scale=1" />
           {helmet.title.toComponent()}
           {helmet.meta.toComponent()}
@@ -213,8 +198,8 @@ class Document extends React.Component {
           {assets.client.css && <link rel="stylesheet" href={assets.client.css} />}
         </head>
         <body {...bodyAttrs}>
-          <AfterRoot />
-          <AfterData data={data} />
+          <Root />
+          <Data data={data} />
           <script type="text/javascript" src={assets.client.js} defer crossOrigin="anonymous" />
         </body>
       </html>
@@ -231,7 +216,6 @@ If you were using something like `styled-components`, and you need to wrap you e
 // ./src/Document.js
 import React from 'react';
 import { ServerStyleSheet } from 'styled-components';
-import { AfterRoot, AfterData } from '@jaredpalmer/after';
 
 export default class Document extends React.Component {
   static async getInitialProps({ assets, data, renderPage }) {
@@ -242,7 +226,7 @@ export default class Document extends React.Component {
   }
 
   render() {
-    const { helmet, assets, data, styleTags } = this.props;
+    const { helmet, assets, data, styleTags, title } = this.props;
     // get attributes from React Helmet
     const htmlAttrs = helmet.htmlAttributes.toComponent();
     const bodyAttrs = helmet.bodyAttributes.toComponent();
@@ -252,7 +236,7 @@ export default class Document extends React.Component {
         <head>
           <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
           <meta charSet="utf-8" />
-          <title>Welcome to the Afterparty</title>
+          <title>{title}</title>
           <meta name="viewport" content="width=device-width, initial-scale=1" />
           {helmet.title.toComponent()}
           {helmet.meta.toComponent()}
@@ -261,8 +245,8 @@ export default class Document extends React.Component {
           {styleTags}
         </head>
         <body {...bodyAttrs}>
-          <AfterRoot />
-          <AfterData data={data} />
+          <Root />
+          <Data data={data} />
           <script type="text/javascript" src={assets.client.js} defer crossOrigin="anonymous" />
         </body>
       </html>
@@ -271,12 +255,12 @@ export default class Document extends React.Component {
 }
 ```
 
-To use your custom `<Document>`, pass it to the `Document` option of your After.js `render` function.
+To use your custom `<Document>`, pass it to the `Document` option of your Before.js `render` function.
 
 ```js
 // ./src/server.js
 import express from 'express';
-import { render } from '@jaredpalmer/after';
+import { render } from '@flybondi/Before';
 import routes from './routes';
 import MyDocument from './Document';
 
@@ -308,7 +292,7 @@ export default server;
 
 ## Custom/Async Rendering
 
-You can provide a custom (potentially async) rendering function as an option to After.js `render` function.
+You can provide a custom (potentially async) rendering function as an option to Before.js `render` function.
 
 If present, it will be used instead of the default ReactDOMServer renderToString function.
 
@@ -324,7 +308,7 @@ Example :
 // ./src/server.js
 import React from 'react';
 import express from 'express';
-import { render } from '@jaredpalmer/after';
+import { render } from '@flybondi/Before';
 import { renderToString } from 'react-dom/server';
 import { ApolloProvider, getDataFromTree } from 'react-apollo';
 import routes from './routes';
