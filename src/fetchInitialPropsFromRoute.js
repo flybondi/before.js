@@ -71,6 +71,7 @@ export async function fetchInitialPropsFromRoute(
         ...match,
         ...route
       },
+      // $FlowFixMe
       data: await getInitialPropsFromComponent(component, match, context)
     };
   }

@@ -2,7 +2,7 @@
 
 const React = require('react');
 const { asyncComponent } = require('./Async.component');
-const { fetchInitialPropsFromRoute } = require('./loadInitialProps');
+const { fetchInitialPropsFromRoute } = require('./fetchInitialPropsFromRoute');
 
 test('should return null if the pathname is invalid', async () => {
   const DummyComponent = () => <span>Hi there!</span>;
