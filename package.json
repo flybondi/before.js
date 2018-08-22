@@ -2,21 +2,21 @@
   "name": "before.js",
   "version": "0.0.1-development",
   "description": "Custom implementation of After.js",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "module": "dist/index.es.js",
   "author": "Luciano Fantone <luciano@flybondi.com>",
   "license": "UNLICENSED",
   "private": true,
   "scripts": {
-    "build": "run-s clean flow.remove-types",
-    "clean": "rm -rf build/",
+    "build": "cross-env NODE_ENV=production rollup -c",
     "coverage": "cat .coverage/lcov.info | codacy-coverage --username nelson-flybondi --projectName before.js",
     "flow.coverage": "flow coverage",
     "flow.install": "flow-typed install --ignoreDeps dev",
-    "flow.remove-types": "flow-remove-types src/ --ignore build/ --ignore flow-types/ --out-dir build/ --pretty",
     "flow.start": "flow start",
     "flow.status": "flow status",
     "flow.stop": "flow stop",
     "lint": "eslint src/",
+    "prepublish": "yarn build",
     "prettier": "prettier --write src/",
     "report": "run-s test.coverage coverage",
     "start": "NODE_OPTIONS=\"-r flow-remove-types/register\" serverless offline start --environment development",
@@ -32,10 +32,7 @@
   "dependencies": {
     "ramda": "^0.25.0",
     "ramda-adjunct": "^2.9.0",
-    "react": "^16.4.1",
-    "react-dom": "^16.4.1",
     "react-helmet": "^5.2.0",
-    "react-router-dom": "^4.3.1",
     "serialize-javascript": "^1.5.0"
   },
   "devDependencies": {
@@ -43,14 +40,16 @@
     "babel-core": "^6.26.3",
     "babel-eslint": "^8.2.6",
     "babel-jest": "^23.4.2",
+    "babel-plugin-external-helpers": "^6.22.0",
     "babel-preset-flow": "^6.23.0",
     "babel-preset-react-app": "^3.1.2",
     "babel-runtime": "^6.26.0",
     "codacy-coverage": "^3.0.0",
     "commitlint": "^7.0.0",
-    "enzyme": "^3.3.0",
-    "enzyme-adapter-react-16": "^1.1.1",
-    "eslint": "^5.2.0",
+    "cross-env": "^5.2.0",
+    "enzyme": "^3.4.4",
+    "enzyme-adapter-react-16": "^1.2.0",
+    "eslint": "^5.4.0",
     "eslint-config-prettier": "^2.9.0",
     "eslint-config-standard": "^11.0.0",
     "eslint-plugin-flowtype": "^2.50.0",
@@ -61,16 +60,22 @@
     "eslint-plugin-ramda": "^2.5.1",
     "eslint-plugin-react": "^7.10.0",
     "eslint-plugin-standard": "^3.1.0",
-    "flow-bin": "^0.77.0",
+    "flow-bin": "^0.79.1",
     "flow-remove-types": "^1.2.3",
     "flow-typed": "^2.5.1",
     "husky": "^1.0.0-rc.13",
-    "jest": "^23.4.2",
-    "lint-staged": "^7.2.0",
+    "jest": "^23.5.0",
+    "lint-staged": "^7.2.2",
     "npm-run-all": "^4.1.3",
     "object-assign": "^4.1.1",
-    "prettier": "^1.14.0",
+    "prettier": "^1.14.2",
     "raf": "^3.4.0",
+    "rollup": "^0.64.1",
+    "rollup-plugin-babel": "^3.0.7",
+    "rollup-plugin-clean": "^1.0.0",
+    "rollup-plugin-flow": "^1.1.1",
+    "rollup-plugin-node-resolve": "^3.3.0",
+    "rollup-plugin-commonjs": "^9.1.5",
     "whatwg-fetch": "^2.0.4"
   },
   "lint-staged": {
@@ -91,17 +96,6 @@
     "extends": [
       "@commitlint/config-conventional"
     ]
-  },
-  "babel": {
-    "presets": [
-      "react-app",
-      "flow"
-    ],
-    "retainLines": true,
-    "env": {
-      "jest": true,
-      "react": true
-    }
   },
   "jest": {
     "verbose": true,

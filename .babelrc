@@ -1,0 +1,9 @@
+{
+  "presets": ["react-app", "flow"],
+  "plugins": ["external-helpers"],
+  "retainLines": true,
+  "env": {
+    "jest": true,
+    "react": true
+  }
+}
