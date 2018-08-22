@@ -39,15 +39,15 @@ export default {
     }),
     commonjs({
       // See babel config in `package.json`
-      include: '**/node_modules/**'
-      // plugins: ['external-helpers'],
-      // externalHelpers: true
+      include: '**/node_modules/**',
+      plugins: ['external-helpers'],
+      externalHelpers: true
     }),
     babel({
       // See babel config in `package.json`
-      exclude: '**/node_modules/**'
-      // plugins: ['external-helpers'],
-      // externalHelpers: true
+      exclude: '**/node_modules/**',
+      plugins: ['external-helpers'],
+      externalHelpers: true
     })
   ]
 };
