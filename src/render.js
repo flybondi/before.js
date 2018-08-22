@@ -5,7 +5,7 @@ import Helmet from 'react-helmet';
 import { StaticRouter } from 'react-router-dom';
 import Before, { type BeforeRoute } from './Before.component';
 import { Document as DefaultDoc, type DocumentProps } from './Document.component';
-import { fetchInitialPropsFromRoute } from './loadInitialProps';
+import { fetchInitialPropsFromRoute } from './fetchInitialPropsFromRoute';
 import { isError, isPromise } from './utils';
 import { parse } from 'url';
 
@@ -77,6 +77,7 @@ export async function render({
   res,
   routes,
   assets,
+  // $FlowFixMe
   Document = DefaultDoc,
   customRenderer,
   ...rest
@@ -85,6 +86,7 @@ export async function render({
   const renderPage = createRenderPage(req.url, routes, customRenderer);
   let response = {};
   try {
+    // $FlowFixMe
     response = await fetchInitialPropsFromRoute(routes, pathname, {
       req,
       res,
@@ -106,7 +108,7 @@ export async function render({
   if (route.redirectTo) {
     return res.redirect(301, req.originalUrl.replace(route.path, route.redirectTo));
   }
-
+  // $FlowFixMe
   const { html, ...docProps } = await Document.getInitialProps({
     req,
     res,

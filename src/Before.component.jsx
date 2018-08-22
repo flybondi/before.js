@@ -1,6 +1,6 @@
 // @flow strict;
 
-import React, { PureComponent } from 'react';
+import React, { Component } from 'react';
 import {
   Switch,
   Route,
@@ -11,7 +11,7 @@ import {
   type RouteProps,
   type ContextRouter
 } from 'react-router-dom';
-import { fetchInitialPropsFromRoute } from './loadInitialProps';
+import { fetchInitialPropsFromRoute } from './fetchInitialPropsFromRoute';
 
 type State = {
   previousLocation: ?Location,
@@ -47,7 +47,7 @@ const throwError = (error: Error) => {
 const createRenderRoute = (
   initialData: any,
   Component: any,
-  prefetch: (pathname: string) => void
+  prefetch: (pathname: string) => Promise<void>
 ) => (props: ContextRouter) => {
   const routeProps = {
     ...initialData,
@@ -59,7 +59,7 @@ const createRenderRoute = (
   return <Component {...routeProps} />;
 };
 
-class Before extends PureComponent<Props, State> {
+class Before extends Component<Props, State> {
   state = {
     previousLocation: null,
     data: undefined
@@ -79,7 +79,7 @@ class Before extends PureComponent<Props, State> {
 
   prefetch = (pathname: string) => {
     const { routes, history } = this.props;
-    fetchInitialPropsFromRoute(routes, pathname, { history })
+    return fetchInitialPropsFromRoute(routes, pathname, { history })
       .then(({ data }) => {
         this.prefetcherCache = {
           ...this.prefetcherCache,

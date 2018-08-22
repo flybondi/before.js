@@ -36,6 +36,7 @@ export function asyncComponent({ loader, Placeholder }: AsyncProps) {
      */
     static load() {
       return loader().then(ResolvedComponent => {
+        // $FlowFixMe
         Component = ResolvedComponent.default || ResolvedComponent;
       });
     }
@@ -43,6 +44,7 @@ export function asyncComponent({ loader, Placeholder }: AsyncProps) {
     static getInitialProps(ctx: any) {
       // Need to call the wrapped components getInitialProps if it exists
       if (Component !== null) {
+        // $FlowFixMe
         return Component.getInitialProps ? Component.getInitialProps(ctx) : Promise.resolve(null);
       }
     }
@@ -61,10 +63,12 @@ export function asyncComponent({ loader, Placeholder }: AsyncProps) {
     render() {
       const { Component: ComponentFromState } = this.state;
       if (ComponentFromState) {
+        // $FlowFixMe
         return <ComponentFromState {...this.props} />;
       }
 
       if (Placeholder) {
+        // $FlowFixMe
         return <Placeholder {...this.props} />;
       }
 

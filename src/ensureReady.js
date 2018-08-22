@@ -15,6 +15,7 @@ export async function ensureReady(
   await Promise.all(
     routes.map(route => {
       const match = matchPath(pathname, route);
+      // $FlowFixMe
       if (match && routeHasComponentLoad(route)) {
         return route.component.load();
       }
