@@ -16,7 +16,8 @@ export default {
       },
       file: pkg.main,
       format: 'cjs',
-      name: 'before'
+      name: 'before.js',
+      sourcemap: 'inline'
     },
     {
       globals: {
@@ -25,7 +26,8 @@ export default {
       },
       file: pkg.module,
       format: 'es',
-      name: 'before'
+      name: 'before.js',
+      sourcemap: 'inline'
     }
   ],
   plugins: [
@@ -38,16 +40,12 @@ export default {
       browser: true
     }),
     commonjs({
-      // See babel config in `package.json`
       include: '**/node_modules/**',
-      plugins: ['external-helpers'],
-      externalHelpers: true
+      plugins: ['external-helpers']
     }),
     babel({
-      // See babel config in `package.json`
       exclude: '**/node_modules/**',
-      plugins: ['external-helpers'],
-      externalHelpers: true
+      plugins: ['external-helpers']
     })
   ]
 };
