@@ -10,7 +10,8 @@ declare class BeforeComponent<TProps, TState> extends React$Component<TProps, TS
 type ComponentType = BeforeComponent<any, any> | React$ElementType | React$ComponentType<any>;
 
 export type AsyncState = {
-  Component: ?ComponentType
+  Component: ?ComponentType,
+  Placeholder?: ?React$Node
 };
 
 type AsyncProps = {
@@ -27,17 +28,19 @@ export function asyncComponent({ loader, Placeholder }: AsyncProps) {
   let Component: ?ComponentType = null; // keep Component in a closure to avoid doing this stuff more than once
   return class AsyncRouteComponent extends React.Component<AsyncProps, AsyncState> {
     state = {
-      Component
+      Component,
+      Placeholder
     };
     /**
      * Static so that you can call load against an uninstantiated version of
      * this component. This should only be called one time outside of the
      * normal render path.
      */
-    static load() {
+    static async load() {
       return loader().then(ResolvedComponent => {
         // $FlowFixMe
         Component = ResolvedComponent.default || ResolvedComponent;
+        return Component;
       });
     }
 
@@ -49,19 +52,17 @@ export function asyncComponent({ loader, Placeholder }: AsyncProps) {
       }
     }
 
-    static getDerivedStateFromProps(props: AsyncProps, state: AsyncState) {
-      return AsyncRouteComponent.load().then(() => {
-        if (state.Component === Component) {
-          return {
-            Component
-          };
-        }
-        return state;
-      });
+    componentDidMount() {
+      const { Component: ComponentFromState } = this.state;
+      if (ComponentFromState === null && Component === null) {
+        AsyncRouteComponent.load().then(loadedComponent => {
+          this.setState(prevState => ({ ...prevState, Component: loadedComponent }));
+        });
+      }
     }
 
     render() {
-      const { Component: ComponentFromState } = this.state;
+      const { Component: ComponentFromState, Placeholder } = this.state;
       if (ComponentFromState) {
         // $FlowFixMe
         return <ComponentFromState {...this.props} />;

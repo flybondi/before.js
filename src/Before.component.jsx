@@ -12,6 +12,7 @@ import {
   type ContextRouter
 } from 'react-router-dom';
 import { fetchInitialPropsFromRoute } from './fetchInitialPropsFromRoute';
+import { isClientSide } from './utils';
 
 type State = {
   previousLocation: ?Location,
@@ -61,21 +62,10 @@ const createRenderRoute = (
 
 class Before extends Component<Props, State> {
   state = {
-    previousLocation: null,
-    data: undefined
+    previousLocation: this.props.location,
+    data: this.props.data
   };
   prefetcherCache = {};
-  static getDerivedStateFromProps(props: Props, state: State) {
-    if (props.location !== state.previousLocation) {
-      const { data, match, routes, history, location, ...rest } = props;
-      return fetchInitialPropsFromRoute(routes, location.pathname, { location, history, ...rest })
-        .then(({ data }) => ({
-          previousLocation: null,
-          data
-        }))
-        .catch(throwError);
-    }
-  }
 
   prefetch = (pathname: string) => {
     const { routes, history } = this.props;
@@ -89,12 +79,36 @@ class Before extends Component<Props, State> {
       .catch(throwError);
   };
 
+  componentDidUpdate(prevProps: Props) {
+    if (isClientSide() && prevProps.location !== this.props.location) {
+      const { routes, history, location, ...rest } = this.props;
+      this.setState(prevState => ({
+        ...prevState,
+        data: undefined,
+        previousLocation: null
+      }));
+      fetchInitialPropsFromRoute(routes, location.pathname, { location, history, ...rest })
+        .then(({ data }) => {
+          this.setState(() => ({
+            previousLocation: location,
+            data
+          }));
+        })
+        .catch(throwError);
+    }
+  }
+
   shouldComponentUpdate(nextProps: Props, nextState: State) {
-    return !nextState.previousLocation;
+    return nextState.previousLocation !== null;
+  }
+
+  getData() {
+    return isClientSide() ? this.state.data : this.props.data;
   }
 
   render() {
-    const { previousLocation, data } = this.state;
+    const data = this.getData();
+    const { previousLocation } = this.state;
     const { location, routes } = this.props;
     const initialData = this.prefetcherCache[location.pathname] || data;
     const loc = previousLocation || location;

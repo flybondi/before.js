@@ -30,7 +30,7 @@ export type DocumentInitialProps = {
   title?: string,
   error?: Error,
   ErrorComponent?: React$ElementType | React$ComponentType<any>,
-  renderPage: () => Promise<any>
+  renderPage: (data: any) => Promise<any>
 };
 
 export class Document extends PureComponent<DocumentProps> {
@@ -41,7 +41,7 @@ export class Document extends PureComponent<DocumentProps> {
     title,
     ...rest
   }: DocumentInitialProps): Promise<DocumentProps> {
-    const page = await renderPage();
+    const page = await renderPage(data);
     return { assets, data, title, ...rest, ...page };
   }
 

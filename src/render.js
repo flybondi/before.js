@@ -57,10 +57,10 @@ const createRenderPage = (
   routes: Array<BeforeRoute<any, any>>,
   renderer: Renderer = defaultRenderer,
   context = {}
-) => async (createPageComponent = defaultCreatePageComponent) => {
+) => async (data, createPageComponent = defaultCreatePageComponent) => {
   const asyncOrSyncRender = renderer(
     <StaticRouter location={url} context={context}>
-      {createPageComponent(Before)({ routes })}
+      {createPageComponent(Before)({ routes, data })}
     </StaticRouter>
   );
 
