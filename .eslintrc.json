@@ -12,6 +12,12 @@
     "node": true,
     "jest": true
   },
+  "settings": {
+    "react": {
+      "version": ">= 16",
+      "flowVersion": ">= 0.79"
+    }
+  },
   "rules": {
     "semi": [2, "always"],
     "no-extra-semi": 2,
