@@ -14,47 +14,57 @@
 
 ## Getting Started with Before.js
 
-Before.js enables Next.js-like data fetching with any React SSR app that uses React Router 4.
+Before.js enables data fetching with any React SSR app that uses React Router 4.
 
 ## Data Fetching
 
-For page components, you can add a `static async getInitialProps` function.
-This will be called on both initial server render, and then client mounts.
+For page components, you can add a `static async getInitialProps({ req, res, match, history, location, ...context })` function.
+This will be called on both initial server render, and then on _componentDidUpdate_.
 Results are made available on `this.props`.
 
 ```js
-// ./src/About.js
-import React from 'react';
-import { NavLink } from 'react-router-dom';
+import React, { PureComponent } from 'react';
 
-class About extends React.Component {
-  static async getInitialProps({ req, res, match }) {
-    const stuff = await CallMyApi();
+export default class About extends PureComponent {
+  static async getInitialProps({ req, res, match, history, location, ...rest }) {
+    const stuff = await asyncDataFecthing();
     return { stuff };
   }
 
   render() {
     return (
       <div>
-        <NavLink to="/">Home</NavLink>
-        <NavLink to="/about">About</NavLink>
         <h1>About</h1>
         {this.props.stuff ? this.props.stuff : 'Loading...'}
       </div>
     );
   }
 }
-
-export default About;
 ```
 
-### `getInitialProps: (ctx) => Data`
+```js
+import React from 'react';
+
+export default const About = ({ stuff }) => (
+  <div>
+    <h1>About</h1>
+    {stuff ? stuff : 'Loading...'}
+  </div>
+);
+
+About.getInitialProps = async ({ req, res, match, history, location, ...rest }) {
+  const stuff = await asyncDataFecthing();
+  return { stuff };
+}
+```
+
+### `static async getInitialProps(context)`
 
 Within `getInitialProps`, you have access to all you need to fetch data on both
 the client and the server:
 
-- `req?: Request`: (server-only) A Express.js request object
-- `res?: Request`: (server-only) An Express.js response object
+- `req?: Request`: (server-only) A server request object
+- `res?: Request`: (server-only) A server response object
 - `match`: React Router 4's `match` object.
 - `history`: React Router 4's `history` object.
 - `location`: (client-only) React Router 4's `location` object.
@@ -62,7 +72,6 @@ the client and the server:
 ### Injected Page Props
 
 - Whatever you have returned in `getInitialProps`
-- `prefetch: (pathname: string) => void` - Imperatively prefetch _and cache_ data for a path. Under the hood this will map through your route tree, call the matching route's `getInitialProps`, store it, and then provide it to your page component. If the user ultimately navigates to that path, the data and component will be ready ahead of time. In the future, there may be more options to control cache behavior in the form of a function or time in milliseconds to keep that data around.
 - `refetch: (nextCtx?: any) => void` - Imperatively call `getInitialProps` again
 
 ## Routing
@@ -129,6 +138,38 @@ class Detail extends React.Component {
 export default Detail;
 ```
 
+### Prefetching inital data
+
+In order to prefecth the initial data for a given route just set the `prefetch` property to `true` and when the component is mounted
+in the client, it will call the `static async getInitialProps` from each route and store them in the `window.localStorage`.
+
+```js
+// ./src/routes.js
+import Home from './Home';
+import About from './About';
+import Detail from './Detail';
+
+const routes = [
+  {
+    path: '/',
+    component: Home,
+    prefetch: false
+  },
+  {
+    path: '/about',
+    component: About,
+    prefetch: true
+  },
+  {
+    path: '/detail/:id',
+    component: Detail,
+    prefetch: true
+  }
+];
+
+export default routes;
+```
+
 ### Client Only Data and Routing
 
 In some parts of your application, you may not need server data fetching at all
@@ -138,13 +179,13 @@ the same exact way.
 
 ## Code Splitting
 
-Before.js lets you easily define lazy-loaded or code-split routes in your `_routes.js` file. To do this, you'll need to modify the relevant route's `component` definition like so:
+Before.js lets you easily define lazy-loaded or code-split routes in your `routes.js` file. To do this, you'll need to modify the relevant route's `component` definition like so:
 
 ```js
 // ./src/_routes.js
 import React from 'react';
 import Home from './Home';
-import { asyncComponent } from '@flybondi/Before';
+import { asyncComponent } from '@flybondi/Before.js.js';
 
 export default [
   // normal route
@@ -171,16 +212,16 @@ Before.js works similarly to Next.js with respect to overriding HTML document st
 
 ```js
 // ./src/Document.js
-import React from 'react';
+import React, { PureComponent } from 'react';
 
-class Document extends React.Component {
+class Document extends PureComponent {
   static async getInitialProps({ assets, data, renderPage }) {
     const page = await renderPage();
     return { assets, data, ...page };
   }
 
   render() {
-    const { helmet, assets, data, title } = this.props;
+    const { helmet, assets, data, title, error, ErrorComponent } = this.props;
     // get attributes from React Helmet
     const htmlAttrs = helmet.htmlAttributes.toComponent();
     const bodyAttrs = helmet.bodyAttributes.toComponent();
@@ -200,6 +241,7 @@ class Document extends React.Component {
         <body {...bodyAttrs}>
           <Root />
           <Data data={data} />
+          {error && ErrorComponent && <ErrorComponent error={error} />}
           <script type="text/javascript" src={assets.client.js} defer crossOrigin="anonymous" />
         </body>
       </html>
@@ -214,10 +256,10 @@ If you were using something like `styled-components`, and you need to wrap you e
 
 ```js
 // ./src/Document.js
-import React from 'react';
+import React, { PureComponent } from 'react';
 import { ServerStyleSheet } from 'styled-components';
 
-export default class Document extends React.Component {
+export default class Document extends PureComponent {
   static async getInitialProps({ assets, data, renderPage }) {
     const sheet = new ServerStyleSheet();
     const page = await renderPage(App => props => sheet.collectStyles(<App {...props} />));
@@ -226,7 +268,7 @@ export default class Document extends React.Component {
   }
 
   render() {
-    const { helmet, assets, data, styleTags, title } = this.props;
+    const { helmet, assets, data, title, error, ErrorComponent } = this.props;
     // get attributes from React Helmet
     const htmlAttrs = helmet.htmlAttributes.toComponent();
     const bodyAttrs = helmet.bodyAttributes.toComponent();
@@ -241,12 +283,12 @@ export default class Document extends React.Component {
           {helmet.title.toComponent()}
           {helmet.meta.toComponent()}
           {helmet.link.toComponent()}
-          {/** here is where we put our Styled Components styleTags... */}
-          {styleTags}
+          {assets.client.css && <link rel="stylesheet" href={assets.client.css} />}
         </head>
         <body {...bodyAttrs}>
           <Root />
           <Data data={data} />
+          {error && ErrorComponent && <ErrorComponent error={error} />}
           <script type="text/javascript" src={assets.client.js} defer crossOrigin="anonymous" />
         </body>
       </html>
@@ -260,16 +302,16 @@ To use your custom `<Document>`, pass it to the `Document` option of your Before
 ```js
 // ./src/server.js
 import express from 'express';
-import { render } from '@flybondi/Before';
+import { render } from '@flybondi/Before.js';
 import routes from './routes';
 import MyDocument from './Document';
 
-const assets = require(process.env.RAZZLE_ASSETS_MANIFEST);
+const assets = require(process.env.ASSETS_MANIFEST);
 
 const server = express();
 server
   .disable('x-powered-by')
-  .use(express.static(process.env.RAZZLE_PUBLIC_DIR))
+  .use(express.static(process.env.PUBLIC_DIR))
   .get('/*', async (req, res) => {
     try {
       // Pass document in here.
@@ -293,11 +335,8 @@ export default server;
 ## Custom/Async Rendering
 
 You can provide a custom (potentially async) rendering function as an option to Before.js `render` function.
-
 If present, it will be used instead of the default ReactDOMServer renderToString function.
-
 It has to return an object of shape `{ html : string!, ...otherProps }`, in which `html` will be used as the rendered string
-
 Thus, setting `customRenderer = (node) => ({ html: ReactDOMServer.renderToString(node) })` is the the same as default option.
 
 `otherProps` will be passed as props to the rendered Document
@@ -308,19 +347,19 @@ Example :
 // ./src/server.js
 import React from 'react';
 import express from 'express';
-import { render } from '@flybondi/Before';
+import { render } from '@flybondi/Before.js';
 import { renderToString } from 'react-dom/server';
 import { ApolloProvider, getDataFromTree } from 'react-apollo';
 import routes from './routes';
 import createApolloClient from './createApolloClient';
 import Document from './Document';
 
-const assets = require(process.env.RAZZLE_ASSETS_MANIFEST);
+const assets = require(process.env.ASSETS_MANIFEST);
 
 const server = express();
 server
   .disable('x-powered-by')
-  .use(express.static(process.env.RAZZLE_PUBLIC_DIR))
+  .use(express.static(process.env.PUBLIC_DIR))
   .get('/*', async (req, res) => {
     const client = createApolloClient({ ssrMode: true });
 
