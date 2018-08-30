@@ -1,4 +1,5 @@
 'use strict';
+/* eslint react/prop-types: 0 */
 
 const React = require('react');
 const { asyncComponent } = require('./Async.component');
@@ -43,7 +44,7 @@ test('should use the default document', async () => {
   expect(html).toBeDefined();
   expect(html).toContain('<!doctype html>');
   expect(html).toContain('<title>Default Document</title>');
-  expect(html).not.toContain('DO_NOT_DELETE_THIS_YOU_WILL_BREAK_YOUR_APP');
+  expect(html).not.toContain('BEFORE.JS-DATA');
 });
 
 test('should return a 404', async () => {

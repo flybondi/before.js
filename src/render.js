@@ -41,7 +41,7 @@ export type BeforeRenderProps<T> = {
 
 const parseDocument: ParseDocument = (Document, docProps, html) => {
   const doc = ReactDOMServer.renderToStaticMarkup(<Document {...docProps} />);
-  return `<!doctype html>` + doc.replace('DO_NOT_DELETE_THIS_YOU_WILL_BREAK_YOUR_APP', html);
+  return `<!doctype html>` + doc.replace('BEFORE.JS-DATA', html);
 };
 
 const defaultRenderer: Renderer = element => ({
@@ -119,6 +119,6 @@ export async function render({
     error: isError(data) && data,
     match: route
   });
-
+  console.log(html);
   return parseDocument(Document, docProps, html);
 }

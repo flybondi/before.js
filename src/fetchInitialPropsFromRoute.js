@@ -44,7 +44,7 @@ const throwError = (error: Error) => {
 const hasGetInitialProps = has('getInitialProps');
 const hasLoad = has('load');
 
-const getInitialPropsFromComponent = async (
+export const getInitialPropsFromComponent = async (
   component: BeforeComponent<any, any>,
   match: ?Match,
   context?: ContextType

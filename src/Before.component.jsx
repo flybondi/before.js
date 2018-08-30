@@ -11,7 +11,10 @@ import {
   type RouteProps,
   type ContextRouter
 } from 'react-router-dom';
-import { fetchInitialPropsFromRoute } from './fetchInitialPropsFromRoute';
+import {
+  fetchInitialPropsFromRoute,
+  getInitialPropsFromComponent
+} from './fetchInitialPropsFromRoute';
 import { isClientSide } from './utils';
 
 type State = {
@@ -28,7 +31,8 @@ declare class BeforeComponent<TProps, TState> extends React$Component<TProps, TS
 export type BeforeRoute<TProps, TState> = {
   ...RouteProps,
   component: BeforeComponent<TProps, TState>,
-  redirectTo?: string
+  redirectTo?: string,
+  prefetch?: boolean
 };
 
 type Props = {
@@ -45,19 +49,25 @@ const throwError = (error: Error) => {
   throw error;
 };
 
-const createRenderRoute = (
-  initialData: any,
-  Component: any,
-  prefetch: (pathname: string) => Promise<void>
-) => (props: ContextRouter) => {
+const createRenderRoute = (initialData: any, Component: any) => (props: ContextRouter) => {
   const routeProps = {
     ...initialData,
     history: props.history,
-    match: props.match,
-    prefetch
+    match: props.match
   };
 
   return <Component {...routeProps} />;
+};
+
+const getDataFromStore = (path: string) => {
+  const data = localStorage.getItem(path);
+  return data ? JSON.parse(data) : null;
+};
+
+const setDataIntoStore = (route: BeforeRoute<any, any>) => (data: any) => {
+  if (route && data) {
+    localStorage.setItem(route.path, JSON.stringify(data));
+  }
 };
 
 class Before extends Component<Props, State> {
@@ -65,29 +75,30 @@ class Before extends Component<Props, State> {
     previousLocation: this.props.location,
     data: this.props.data
   };
-  prefetcherCache = {};
+  prefetchInitialPropsFromAllRoutes = async () => {
+    const routesForpreFetch = this.props.routes.filter(r => r.prefetch);
+    const promises = routesForpreFetch.map(route =>
+      getInitialPropsFromComponent(route.component, route).then(setDataIntoStore(route))
+    );
 
-  prefetch = (pathname: string) => {
-    const { routes, history } = this.props;
-    return fetchInitialPropsFromRoute(routes, pathname, { history })
-      .then(({ data }) => {
-        this.prefetcherCache = {
-          ...this.prefetcherCache,
-          [pathname]: data
-        };
-      })
-      .catch(throwError);
+    return Promise.all(promises).catch(throwError);
   };
+
+  constructor(props) {
+    super(props);
+    isClientSide() && this.prefetchInitialPropsFromAllRoutes();
+  }
 
   componentDidUpdate(prevProps: Props) {
     if (isClientSide() && prevProps.location !== this.props.location) {
-      const { routes, history, location, ...rest } = this.props;
-      this.setState(prevState => ({
-        ...prevState,
-        data: undefined,
-        previousLocation: null
-      }));
-      fetchInitialPropsFromRoute(routes, location.pathname, { location, history, ...rest })
+      const { history, location, ...rest } = this.props;
+      const notPrefetchedRoutes = this.props.routes.filter(r => !r.prefetch);
+      // @ToDo This could be update to use the `getInitialPropsFromComponent` method instead.
+      fetchInitialPropsFromRoute(notPrefetchedRoutes, location.pathname, {
+        location,
+        history,
+        ...rest
+      })
         .then(({ data }) => {
           this.setState(() => ({
             previousLocation: location,
@@ -102,23 +113,22 @@ class Before extends Component<Props, State> {
     return nextState.previousLocation !== null;
   }
 
-  getData() {
-    return isClientSide() ? this.state.data : this.props.data;
+  getData(pathname: string) {
+    return isClientSide() ? getDataFromStore(pathname) || this.state.data : this.props.data;
   }
 
   render() {
-    const data = this.getData();
     const { previousLocation } = this.state;
     const { location, routes } = this.props;
-    const initialData = this.prefetcherCache[location.pathname] || data;
     const loc = previousLocation || location;
+    const initialData = this.getData(loc.pathname);
     return (
       <Switch location={loc}>
         {routes.map((route, index) => (
           <Route
             key={`route--${index}`}
             path={route.path}
-            render={createRenderRoute(initialData, route.component, this.prefetch)}
+            render={createRenderRoute(initialData, route.component)}
             exact={route.exact}
           />
         ))}

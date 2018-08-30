@@ -30,7 +30,7 @@ export type DocumentInitialProps = {
   title?: string,
   error?: Error,
   ErrorComponent?: React$ElementType | React$ComponentType<any>,
-  renderPage: (data: any) => Promise<any>
+  renderPage: () => Promise<any>
 };
 
 export class Document extends PureComponent<DocumentProps> {
@@ -74,7 +74,7 @@ export class Document extends PureComponent<DocumentProps> {
   }
 }
 
-export const Root = () => <div id="root">DO_NOT_DELETE_THIS_YOU_WILL_BREAK_YOUR_APP</div>;
+export const Root = () => <div id="root">BEFORE.JS-DATA</div>;
 
 export const Data = ({ data }: any) => (
   <script

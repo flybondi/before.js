@@ -47,6 +47,6 @@ test('should render the server-app-state', () => {
   expect(documentProps.helmet.link.toComponent).toHaveBeenCalled();
   expect(title.text()).toBe('This is a test');
   expect(script.text()).toBe('{"test":true}');
-  expect(root.text()).toBe('DO_NOT_DELETE_THIS_YOU_WILL_BREAK_YOUR_APP');
+  expect(root.text()).toBe('BEFORE.JS-DATA');
   expect(link.prop('href')).toBe('css-path.css');
 });
