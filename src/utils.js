@@ -1,7 +1,22 @@
 // @flow strict;
-import { anyPass, is, complement } from 'ramda';
-import isAsyncFunction from 'ramda-adjunct/es/isAsyncFunction';
-import isGeneratorFunction from 'ramda-adjunct/es/isGeneratorFunction';
+import { anyPass, equals, is, complement } from 'ramda';
+
+const isNull = equals(null);
+const isNotNull = complement(isNull);
+let GeneratorFunction = null;
+try {
+  GeneratorFunction = new Function('return function* () {}')().constructor; // eslint-disable-line no-new-func
+} catch (e) {}
+
+const isGeneratorFunction = (value: any) => {
+  const toStringCheck = Object.prototype.toString.call(value) === '[object GeneratorFunction]';
+  const legacyConstructorCheck = isNotNull(GeneratorFunction) && value instanceof GeneratorFunction;
+
+  return toStringCheck || legacyConstructorCheck;
+};
+
+const isAsyncFunction = (value: any) =>
+  Object.prototype.toString.call(value) === '[object AsyncFunction]';
 
 export const isFunction: (value: any) => boolean = anyPass([
   is(Function),

@@ -31,7 +31,6 @@
   },
   "dependencies": {
     "ramda": "^0.25.0",
-    "ramda-adjunct": "^2.9.0",
     "react-helmet": "^5.2.0",
     "serialize-javascript": "^1.5.0"
   },
