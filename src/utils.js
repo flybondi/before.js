@@ -1,6 +1,7 @@
 // @flow strict;
 import { anyPass, is, complement } from 'ramda';
-import { isGeneratorFunction, isAsyncFunction } from 'ramda-adjunct';
+import isAsyncFunction from 'ramda-adjunct/es/isAsyncFunction';
+import isGeneratorFunction from 'ramda-adjunct/es/isGeneratorFunction';
 
 export const isFunction: (value: any) => boolean = anyPass([
   is(Function),

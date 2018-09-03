@@ -1,8 +1,4 @@
 {
-  "presets": ["react-app", "flow"],
-  "retainLines": true,
-  "env": {
-    "jest": true,
-    "react": true
-  }
+  "presets": ["react-app", "@babel/preset-flow"],
+  "retainLines": true
 }

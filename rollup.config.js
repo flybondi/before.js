@@ -3,11 +3,13 @@ import resolve from 'rollup-plugin-node-resolve';
 import babel from 'rollup-plugin-babel';
 import commonjs from 'rollup-plugin-commonjs';
 import flow from 'rollup-plugin-flow';
+import bundleSize from 'rollup-plugin-bundle-size';
+import ramda from 'rollup-plugin-ramda';
 import pkg from './package.json';
 
 export default {
   input: 'index.js',
-  external: ['react', 'react-dom', 'react-router-dom'],
+  external: ['react', 'react-dom', 'react-router-dom', 'url'],
   output: [
     {
       globals: {
@@ -40,12 +42,12 @@ export default {
       browser: true
     }),
     commonjs({
-      include: '**/node_modules/**',
-      plugins: ['external-helpers']
+      include: '**/node_modules/**'
     }),
     babel({
-      exclude: '**/node_modules/**',
-      plugins: ['external-helpers']
-    })
+      exclude: '**/node_modules/**'
+    }),
+    ramda(),
+    bundleSize()
   ]
 };
