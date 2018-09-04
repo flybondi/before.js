@@ -59,14 +59,16 @@ const createRenderRoute = (initialData: any, Component: any) => (props: ContextR
   return <Component {...routeProps} />;
 };
 
-const getDataFromStore = (path: string) => {
-  const data = localStorage.getItem(path);
+const getDataFromStore = (key: string) => {
+  const data = localStorage.getItem(key);
   return data ? JSON.parse(data) : null;
 };
 
 const setDataIntoStore = (route: BeforeRoute<any, any>) => (data: any) => {
   if (route && data) {
-    localStorage.setItem(route.path, JSON.stringify(data));
+    const { path } = route;
+    const { hostname } = window.location;
+    localStorage.setItem(`${hostname}${path}`, JSON.stringify(data));
   }
 };
 
@@ -76,9 +78,10 @@ class Before extends Component<Props, State> {
     data: this.props.data
   };
   prefetchInitialPropsFromAllRoutes = async () => {
-    const routesForpreFetch = this.props.routes.filter(r => r.prefetch);
+    const { location, routes } = this.props;
+    const routesForpreFetch = routes.filter(r => r.prefetch);
     const promises = routesForpreFetch.map(route =>
-      getInitialPropsFromComponent(route.component, route).then(setDataIntoStore(route))
+      getInitialPropsFromComponent(route.component, route).then(setDataIntoStore(route, location))
     );
 
     return Promise.all(promises).catch(throwError);
@@ -91,8 +94,8 @@ class Before extends Component<Props, State> {
 
   componentDidUpdate(prevProps: Props) {
     if (isClientSide() && prevProps.location !== this.props.location) {
-      const { history, location, ...rest } = this.props;
-      const notPrefetchedRoutes = this.props.routes.filter(r => !r.prefetch);
+      const { history, location, routes, ...rest } = this.props;
+      const notPrefetchedRoutes = routes.filter(r => !r.prefetch);
       // @ToDo This could be update to use the `getInitialPropsFromComponent` method instead.
       fetchInitialPropsFromRoute(notPrefetchedRoutes, location.pathname, {
         location,
@@ -113,8 +116,10 @@ class Before extends Component<Props, State> {
     return nextState.previousLocation !== null;
   }
 
-  getData(pathname: string) {
-    return isClientSide() ? getDataFromStore(pathname) || this.state.data : this.props.data;
+  getData(path: string) {
+    return isClientSide()
+      ? getDataFromStore(`${window.location.hostname}${path}`) || this.state.data
+      : this.props.data;
   }
 
   render() {
