@@ -1,11 +1,18 @@
 {
   "name": "@flybondi/before.js",
-  "version": "0.0.1-development.0",
-  "description": "Custom implementation of After.js",
+  "version": "0.0.1-development",
+  "description": "Enables data fetching with any React SSR app that uses React Router 4",
   "main": "dist/index.js",
   "module": "dist/index.es.js",
   "author": "Flybondi <dev@flybondi.com>",
   "license": "proprietary",
+  "keywords": [
+    "react",
+    "react ssr",
+    "react-router",
+    "before",
+    "async"
+  ],
   "scripts": {
     "build.code": "cross-env NODE_ENV=production rollup -c",
     "build": "run-s build.*",
