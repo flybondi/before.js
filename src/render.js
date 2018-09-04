@@ -119,6 +119,6 @@ export async function render({
     error: isError(data) && data,
     match: route
   });
-  console.log(html);
+
   return parseDocument(Document, docProps, html);
 }
