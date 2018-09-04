@@ -1,6 +1,6 @@
 {
   "name": "before.js",
-  "version": "0.0.1-development",
+  "version": "0.0.1-development.0",
   "description": "Custom implementation of After.js",
   "main": "dist/index.js",
   "module": "dist/index.es.js",
