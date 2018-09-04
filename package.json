@@ -1,11 +1,11 @@
 {
-  "name": "before.js",
+  "name": "@flybondi/before.js",
   "version": "0.0.1-development.0",
   "description": "Custom implementation of After.js",
   "main": "dist/index.js",
   "module": "dist/index.es.js",
-  "author": "Luciano Fantone <luciano@flybondi.com>",
-  "license": "UNLICENSED",
+  "author": "Flybondi <dev@flybondi.com>",
+  "license": "proprietary",
   "scripts": {
     "build.code": "cross-env NODE_ENV=production rollup -c",
     "build": "run-s build.*",
