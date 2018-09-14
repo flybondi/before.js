@@ -1,0 +1,9 @@
+[ignore]
+.*/build/*
+.*/.circleci/*
+.*/.github/*
+.*/.vscode/*
+.*/test/*
+.*/node_modules/*
+[libs]
+.*/flow-typed/*
