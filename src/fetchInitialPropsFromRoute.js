@@ -36,11 +36,6 @@ const checkMatchPath = (pathname: string) => (route: BeforeRoute<any, any>) =>
   isNotNil(matchPath(pathname, route));
 const findRouteByPathname = (pathname: string) => find(checkMatchPath(pathname));
 
-const throwError = (error: Error) => {
-  console.error('There was an error while trying to retrieve the initial props', error);
-  throw error;
-};
-
 const hasGetInitialProps = has('getInitialProps');
 const hasLoad = has('load');
 
@@ -60,7 +55,8 @@ export const getInitialPropsFromComponent = async (
         match
       });
     } catch (error) {
-      throwError(error);
+      console.error('There was an error while trying to retrieve the initial props', error);
+      throw error;
     }
   }
   return null;
