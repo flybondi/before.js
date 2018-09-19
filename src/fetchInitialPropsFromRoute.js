@@ -48,20 +48,32 @@ export const getInitialPropsFromComponent = async (
   component: BeforeComponent<any, any>,
   match: ?Match,
   context?: ContextType
-) =>
-  match && hasGetInitialProps(component)
-    ? hasLoad(component)
-      ? component
-          .load()
-          .then(() => component.getInitialProps({ match, ...context }).catch(throwError))
-      : component.getInitialProps({ match, ...context }).catch(throwError)
-    : null;
+) => {
+  if (match && hasGetInitialProps(component)) {
+    try {
+      if (hasLoad(component)) {
+        await component.load();
+      }
+      return await component.getInitialProps({
+        // Note: context contains the old `match` too, so it's important to overwrite that with the new `match`
+        ...context,
+        match
+      });
+    } catch (error) {
+      throwError(error);
+    }
+  }
+  return null;
+};
 
 export async function fetchInitialPropsFromRoute(
   routes: Array<BeforeRoute<any, any>>,
   pathname: string = '',
   context?: ContextType
-): Promise<{ route: ?Route, data: ?any }> {
+): Promise<{
+  route: ?Route,
+  data: ?any
+}> {
   const route = findRouteByPathname(pathname)(routes);
   if (route) {
     const match = matchPath(pathname, route);
