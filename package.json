@@ -1,11 +1,11 @@
 {
   "name": "@flybondi/before.js",
-  "version": "1.0.0",
+  "version": "0.0.0-development",
   "description": "Enables data fetching with any React SSR app that uses React Router 4",
   "main": "dist/index.js",
   "module": "dist/index.es.js",
   "author": "Flybondi <dev@flybondi.com>",
-  "license": "proprietary",
+  "license": "UNLICENSED",
   "keywords": [
     "react",
     "react ssr",

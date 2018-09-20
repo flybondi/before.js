@@ -115,6 +115,29 @@ test('should fetch initial props from matched route component', async () => {
   });
 });
 
+test('should return null if the component does not have a fetch initial props method', async () => {
+  const DummyComponent = () => <span>Hi there!</span>;
+  // DummyComponent.getInitialProps = jest.fn().mockResolvedValue({ test: true });
+  const mockRoutes = [
+    {
+      path: '/',
+      exact: true,
+      component: DummyComponent
+    }
+  ];
+  const mockMatch = {
+    isExact: true,
+    params: {},
+    path: '/',
+    url: '/'
+  };
+
+  const props = await fetchInitialPropsFromRoute(mockRoutes, '/');
+
+  expect(props).toHaveProperty('route', { ...mockMatch, ...mockRoutes[0] });
+  expect(props).toHaveProperty('data', null);
+});
+
 test('should not fetch initial props from matched route component', async () => {
   const DummyComponent = () => <span>Hi there!</span>;
   const mockLoader = jest.fn().mockResolvedValue(DummyComponent);
