@@ -36,7 +36,7 @@ export type BeforeRenderProps<T> = {
   assets: any,
   customRenderer?: Renderer,
   routes: Array<BeforeRoute<any, any>>,
-  Document: typeof DefaultDoc | React$ComponentType<T>
+  document: typeof DefaultDoc | React$ComponentType<T>
 };
 
 const parseDocument: ParseDocument = (Document, docProps, html) => {
@@ -78,7 +78,7 @@ export async function render({
   routes,
   assets,
   // $FlowFixMe
-  Document = DefaultDoc,
+  document: Document = DefaultDoc,
   customRenderer,
   ...rest
 }: BeforeRenderProps<DocumentProps>) {

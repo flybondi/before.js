@@ -127,7 +127,7 @@ test('should throw an error if can not load route component initial props', asyn
     routes: mockRoutes,
     assets: { client: {} },
     title: 'Error',
-    ErrorComponent: ErrorComponent
+    errorComponent: ErrorComponent
   };
   const { render } = require('./render');
   const html = await render(options);
@@ -161,7 +161,7 @@ test('should use given Document component', async () => {
     routes: mockRoutes,
     assets: { client: {} },
     title: 'Custom document',
-    Document: CustomDocument
+    document: CustomDocument
   };
   const { render } = require('./render');
   const html = await render(options);
