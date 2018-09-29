@@ -15,7 +15,7 @@ export type DocumentProps = {
   data: any,
   title: ?string,
   error?: Error,
-  ErrorComponent?: React$ElementType | React$ComponentType<any>
+  errorComponent?: React$ElementType | React$ComponentType<any>
 };
 
 export type DocumentInitialProps = {
@@ -29,8 +29,8 @@ export type DocumentInitialProps = {
   data: any,
   title?: string,
   error?: Error,
-  ErrorComponent?: React$ElementType | React$ComponentType<any>,
-  renderPage: () => Promise<any>
+  errorComponent?: React$ElementType | React$ComponentType<any>,
+  renderPage: (data: { [key: string]: any }) => Promise<any>
 };
 
 export class Document extends PureComponent<DocumentProps> {
@@ -46,7 +46,7 @@ export class Document extends PureComponent<DocumentProps> {
   }
 
   render() {
-    const { helmet, assets, data, title, error, ErrorComponent } = this.props;
+    const { helmet, assets, data, title, error, errorComponent: ErrorComponent } = this.props;
     // get attributes from React Helmet
     const htmlAttrs = helmet.htmlAttributes.toComponent();
     const bodyAttrs = helmet.bodyAttributes.toComponent();
