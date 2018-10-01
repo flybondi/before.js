@@ -98,3 +98,26 @@ test('should filter the server-app-state with the given function', () => {
   expect(root.text()).toBe('BEFORE.JS-DATA');
   expect(link.prop('href')).toBe('css-path.css');
 });
+
+test('should call the function to generate the critical CSS', () => {
+  const documentInitialProps = {
+    assets: {
+      client: {
+        css: 'css-path.css',
+        js: 'js-path.js'
+      }
+    },
+    data: {
+      test: true,
+      shouldFilterMe: true
+    },
+    title: 'This is a test',
+    renderPage: jest.fn().mockResolvedValue({ html: 'test' }),
+    generateCriticalCSS: jest.fn().mockReturnValue('critical styles')
+  };
+  return expect(Document.getInitialProps(documentInitialProps)).resolves.toMatchObject(
+    expect.objectContaining({
+      criticalCSS: 'critical styles'
+    })
+  );
+});

@@ -2,8 +2,8 @@
 
 import type { StateOnServer } from 'react-helmet';
 import React, { PureComponent } from 'react';
+import { F, identity } from 'ramda';
 import serialize from 'serialize-javascript';
-import { identity } from 'ramda';
 
 export type DocumentProps = {
   helmet: StateOnServer,
@@ -17,7 +17,8 @@ export type DocumentProps = {
   title: ?string,
   error?: Error,
   errorComponent?: React$ElementType | React$ComponentType<any>,
-  filterServerData: (data: { [key: string]: any }) => { [key: string]: any }
+  filterServerData: (data: { [key: string]: any }) => { [key: string]: any },
+  criticalCSS: React$Node | false
 };
 
 export type DocumentInitialProps = {
@@ -33,7 +34,8 @@ export type DocumentInitialProps = {
   error?: Error,
   errorComponent?: React$ElementType | React$ComponentType<any>,
   filterServerData: (data: { [key: string]: any }) => { [key: string]: any },
-  renderPage: (data: { [key: string]: any }) => Promise<any>
+  renderPage: (data: { [key: string]: any }) => Promise<any>,
+  generateCriticalCSS: () => React$Node | false
 };
 
 export class Document extends PureComponent<DocumentProps> {
@@ -41,17 +43,20 @@ export class Document extends PureComponent<DocumentProps> {
     assets,
     data,
     renderPage,
+    generateCriticalCSS = F,
     title,
     ...rest
   }: DocumentInitialProps): Promise<DocumentProps> {
     const page = await renderPage(data);
-    return { assets, data, title, ...rest, ...page };
+    const criticalCSS = generateCriticalCSS();
+    return { assets, criticalCSS, data, title, ...rest, ...page };
   }
 
   render() {
     const {
       helmet,
       assets,
+      criticalCSS,
       data,
       title,
       error,
@@ -72,6 +77,7 @@ export class Document extends PureComponent<DocumentProps> {
           {helmet.title.toComponent()}
           {helmet.meta.toComponent()}
           {helmet.link.toComponent()}
+          {criticalCSS !== false && criticalCSS}
           {assets.client.css && <link rel="stylesheet" href={assets.client.css} />}
         </head>
         <body {...bodyAttrs}>
