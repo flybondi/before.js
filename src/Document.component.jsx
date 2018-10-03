@@ -3,6 +3,7 @@
 import type { StateOnServer } from 'react-helmet';
 import React, { PureComponent } from 'react';
 import serialize from 'serialize-javascript';
+import { identity } from 'ramda';
 
 export type DocumentProps = {
   helmet: StateOnServer,
@@ -15,7 +16,8 @@ export type DocumentProps = {
   data: any,
   title: ?string,
   error?: Error,
-  errorComponent?: React$ElementType | React$ComponentType<any>
+  errorComponent?: React$ElementType | React$ComponentType<any>,
+  filterServerData: (data: { [key: string]: any }) => { [key: string]: any }
 };
 
 export type DocumentInitialProps = {
@@ -30,6 +32,7 @@ export type DocumentInitialProps = {
   title?: string,
   error?: Error,
   errorComponent?: React$ElementType | React$ComponentType<any>,
+  filterServerData: (data: { [key: string]: any }) => { [key: string]: any },
   renderPage: (data: { [key: string]: any }) => Promise<any>
 };
 
@@ -46,7 +49,15 @@ export class Document extends PureComponent<DocumentProps> {
   }
 
   render() {
-    const { helmet, assets, data, title, error, errorComponent: ErrorComponent } = this.props;
+    const {
+      helmet,
+      assets,
+      data,
+      title,
+      error,
+      errorComponent: ErrorComponent,
+      filterServerData = identity
+    } = this.props;
     // get attributes from React Helmet
     const htmlAttrs = helmet.htmlAttributes.toComponent();
     const bodyAttrs = helmet.bodyAttributes.toComponent();
@@ -65,7 +76,7 @@ export class Document extends PureComponent<DocumentProps> {
         </head>
         <body {...bodyAttrs}>
           <Root />
-          <Data data={data} />
+          <Data data={filterServerData(data)} />
           {error && ErrorComponent && <ErrorComponent error={error} />}
           <script type="text/javascript" src={assets.client.js} defer crossOrigin="anonymous" />
         </body>
