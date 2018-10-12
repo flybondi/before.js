@@ -54,7 +54,6 @@ export const getInitialPropsFromComponent = async (
   if (match && hasGetInitialProps(component)) {
     const location = isNotNil(context.location) ? context.location : { search: '' };
     const req = isNotNil(context.req) ? context.req : { query: {} };
-    console.log(isClientSide);
     const querystring = isClientSide() ? parse(location.search) : req.query;
     try {
       if (hasLoad(component)) {
