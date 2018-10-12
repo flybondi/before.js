@@ -84,8 +84,7 @@ jobs:
           command: yarn install --pure-lockfile
       - deploy:
           name: Semantic release
-          command:
-            npx -p @flybondi/semantic-release-packages-config -p semantic-release@next semantic-release -e @flybondi/semantic-release-packages-config
+          command: npx -p @flybondi/semantic-release-packages-config@$SEMANTIC_PKGS_VERSION -p semantic-release@$SEMANTIC_VERSION semantic-release -e @flybondi/semantic-release-packages-config
 
 workflows:
   version: 2
