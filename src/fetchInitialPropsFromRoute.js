@@ -2,6 +2,8 @@
 import type { BeforeRoute } from './Before.component';
 import { matchPath, type Match } from 'react-router-dom';
 import { complement, has, find, isNil } from 'ramda';
+import { parse } from 'query-string';
+import { isClientSide } from './utils';
 
 declare class BeforeComponent<TProps, TState> extends React$Component<TProps, TState> {
   default?: BeforeComponent<TProps, TState>;
@@ -22,8 +24,13 @@ export type InitialProps = {
 
 type ContextType = {
   [key: string]: any,
-  req?: any,
-  res?: any
+  req?: {
+    query?: { [key: string]: string }
+  },
+  res?: any,
+  location?: {
+    search: string
+  }
 };
 
 type Route = {
@@ -42,9 +49,12 @@ const hasLoad = has('load');
 export const getInitialPropsFromComponent = async (
   component: BeforeComponent<any, any>,
   match: ?Match,
-  context?: ContextType
+  context: ContextType = {}
 ) => {
   if (match && hasGetInitialProps(component)) {
+    const location = isNotNil(context.location) ? context.location : { search: '' };
+    const req = isNotNil(context.req) ? context.req : { query: {} };
+    const querystring = isClientSide() ? parse(location.search) : req.query;
     try {
       if (hasLoad(component)) {
         await component.load();
@@ -52,7 +62,10 @@ export const getInitialPropsFromComponent = async (
       return await component.getInitialProps({
         // Note: context contains the old `match` too, so it's important to overwrite that with the new `match`
         ...context,
-        match
+        match: {
+          ...match,
+          querystring
+        }
       });
     } catch (error) {
       console.error('There was an error while trying to retrieve the initial props', error);

@@ -4,6 +4,11 @@ const React = require('react');
 const { asyncComponent } = require('./Async.component');
 const { fetchInitialPropsFromRoute } = require('./fetchInitialPropsFromRoute');
 
+beforeEach(() => {
+  jest.resetModules();
+  jest.clearAllMocks();
+});
+
 test('should return null if the pathname is invalid', async () => {
   const DummyComponent = () => <span>Hi there!</span>;
   const mockLoader = jest.fn().mockResolvedValue(DummyComponent);
@@ -107,7 +112,100 @@ test('should fetch initial props from matched route component', async () => {
   const props = await fetchInitialPropsFromRoute(mockRoutes, '/');
 
   expect(DummyComponent.getInitialProps).toHaveBeenCalledWith({
-    match: mockMatch
+    match: {
+      ...mockMatch,
+      querystring: {}
+    }
+  });
+  expect(props).toHaveProperty('route', { ...mockMatch, ...mockRoutes[0] });
+  expect(props).toHaveProperty('data', {
+    test: true
+  });
+});
+
+test('should fetch initial props from matched route with the parsed querystring from request context', async () => {
+  const DummyComponent = () => <span>Hi there!</span>;
+  DummyComponent.getInitialProps = jest.fn().mockResolvedValue({ test: true });
+  const mockRoutes = [
+    {
+      path: '/',
+      exact: true,
+      component: DummyComponent
+    },
+    {
+      path: '/no-match-path'
+    }
+  ];
+  const mockMatch = {
+    isExact: true,
+    params: {},
+    path: '/',
+    url: '/'
+  };
+  const mockContext = {
+    req: {
+      query: {
+        dummyString: '1'
+      }
+    }
+  };
+
+  const props = await fetchInitialPropsFromRoute(mockRoutes, '/', mockContext);
+
+  expect(DummyComponent.getInitialProps).toHaveBeenCalledWith({
+    ...mockContext,
+    match: {
+      ...mockMatch,
+      querystring: {
+        dummyString: '1'
+      }
+    }
+  });
+  expect(props).toHaveProperty('route', { ...mockMatch, ...mockRoutes[0] });
+  expect(props).toHaveProperty('data', {
+    test: true
+  });
+});
+
+test('should fetch initial props from matched route with the parsed querystring from location context', async () => {
+  jest.doMock('./utils', () => ({
+    isClientSide: jest.fn().mockReturnValue(true)
+  }));
+  const { fetchInitialPropsFromRoute } = require('./fetchInitialPropsFromRoute');
+  const DummyComponent = () => <span>Hi there!</span>;
+  DummyComponent.getInitialProps = jest.fn().mockResolvedValue({ test: true });
+  const mockRoutes = [
+    {
+      path: '/',
+      exact: true,
+      component: DummyComponent
+    },
+    {
+      path: '/no-match-path'
+    }
+  ];
+  const mockMatch = {
+    isExact: true,
+    params: {},
+    path: '/',
+    url: '/'
+  };
+  const mockContext = {
+    location: {
+      search: '?dummyString=1'
+    }
+  };
+
+  const props = await fetchInitialPropsFromRoute(mockRoutes, '/', mockContext);
+
+  expect(DummyComponent.getInitialProps).toHaveBeenCalledWith({
+    ...mockContext,
+    match: {
+      ...mockMatch,
+      querystring: {
+        dummyString: '1'
+      }
+    }
   });
   expect(props).toHaveProperty('route', { ...mockMatch, ...mockRoutes[0] });
   expect(props).toHaveProperty('data', {
@@ -192,7 +290,10 @@ test('should throw an error while fetching initial props from matched route comp
     await fetchInitialPropsFromRoute(mockRoutes, '/');
   } catch (error) {
     expect(DummyComponent.getInitialProps).toHaveBeenCalledWith({
-      match: mockMatch
+      match: {
+        ...mockMatch,
+        querystring: {}
+      }
     });
     expect(error).toHaveProperty('message', 'mock error');
   }
@@ -224,7 +325,10 @@ test('should throw an error while fetching initial props from matched async rout
   } catch (error) {
     expect(mockLoader).toHaveBeenCalled();
     expect(DummyComponent.getInitialProps).toHaveBeenCalledWith({
-      match: mockMatch
+      match: {
+        ...mockMatch,
+        querystring: {}
+      }
     });
     expect(error).toHaveProperty('message', 'mock async error');
   }

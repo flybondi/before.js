@@ -36,7 +36,9 @@ export type BeforeRenderProps<T> = {
   assets: any,
   customRenderer?: Renderer,
   routes: Array<BeforeRoute<any, any>>,
-  Document: typeof DefaultDoc | React$ComponentType<T>
+  document: typeof DefaultDoc | React$ComponentType<T>,
+  filterServerData: (data: { [key: string]: any }) => { [key: string]: any },
+  generateCriticalCSS: () => React$Node | false
 };
 
 const parseDocument: ParseDocument = (Document, docProps, html) => {
@@ -78,7 +80,9 @@ export async function render({
   routes,
   assets,
   // $FlowFixMe
-  Document = DefaultDoc,
+  document: Document = DefaultDoc,
+  filterServerData,
+  generateCriticalCSS,
   customRenderer,
   ...rest
 }: BeforeRenderProps<DocumentProps>) {
@@ -115,6 +119,8 @@ export async function render({
     assets,
     renderPage,
     data,
+    filterServerData,
+    generateCriticalCSS,
     ...rest,
     error: isError(data) && data,
     match: route
