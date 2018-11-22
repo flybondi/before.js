@@ -25,7 +25,6 @@
     "lint": "eslint src/",
     "prepublishOnly": "yarn build",
     "prettier": "prettier --write src/",
-    "report": "run-s test.coverage coverage",
     "start": "NODE_OPTIONS=\"-r flow-remove-types/register\" serverless offline start --environment development",
     "test.coverage": "yarn test --coverage --coverageDirectory .coverage",
     "test.watch": "jest --watchAll",
