@@ -121,9 +121,6 @@
     "transformIgnorePatterns": [
       "[/\\\\]node_modules[/\\\\].+\\.(js|jsx|mjs)$"
     ],
-    "setupFiles": [
-      "<rootDir>/config/polyfills.js"
-    ],
     "setupTestFrameworkScriptFile": "<rootDir>/config/enzyme.config.js",
     "testEnvironment": "node",
     "moduleNameMapper": {
