@@ -16,7 +16,6 @@
   "scripts": {
     "build.code": "cross-env NODE_ENV=production rollup -c",
     "build": "run-s build.*",
-    "coverage": "cat .coverage/lcov.info | codacy-coverage --username nelson-flybondi --projectName before.js",
     "flow.coverage": "flow coverage",
     "flow.install": "flow-typed install --ignoreDeps dev",
     "flow.start": "flow start",
