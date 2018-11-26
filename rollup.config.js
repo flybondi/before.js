@@ -45,6 +45,7 @@ export default {
       include: '**/node_modules/**'
     }),
     babel({
+      runtimeHelpers: true,
       exclude: '**/node_modules/**'
     }),
     ramda(),

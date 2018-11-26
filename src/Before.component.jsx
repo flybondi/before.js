@@ -32,7 +32,10 @@ export type BeforeRoute<TProps, TState> = {
   ...RouteProps,
   component: BeforeComponent<TProps, TState>,
   redirectTo?: string,
-  prefetch?: boolean
+  prefetch?: boolean,
+  isExact: boolean,
+  params: { [key: string]: ?string },
+  url: string
 };
 
 type Props = {
@@ -68,7 +71,7 @@ const setDataIntoStore = (route: BeforeRoute<any, any>) => (data: any) => {
   if (route && data) {
     const { path } = route;
     const { hostname } = window.location;
-    localStorage.setItem(`${hostname}${path}`, JSON.stringify(data));
+    localStorage.setItem(`${hostname}${path || ''}`, JSON.stringify(data));
   }
 };
 
@@ -81,7 +84,7 @@ class Before extends Component<Props, State> {
     const { location, routes } = this.props;
     const routesForpreFetch = routes.filter(r => r.prefetch);
     const promises = routesForpreFetch.map(route =>
-      getInitialPropsFromComponent(route.component, route).then(setDataIntoStore(route, location))
+      getInitialPropsFromComponent(route.component, route).then(setDataIntoStore(route))
     );
 
     return Promise.all(promises).catch(throwError);

@@ -3,6 +3,7 @@
 import type { StateOnServer } from 'react-helmet';
 import React, { PureComponent } from 'react';
 import { F, identity } from 'ramda';
+import Error from './Error.component';
 import serialize from 'serialize-javascript';
 
 export type DocumentProps = {
@@ -83,7 +84,9 @@ export class Document extends PureComponent<DocumentProps> {
         <body {...bodyAttrs}>
           <Root />
           <Data data={filterServerData(data)} />
-          {error && ErrorComponent && <ErrorComponent error={error} />}
+          {error
+            ? ErrorComponent ? <ErrorComponent error={error} /> : <Error message={error.message} stack={error.stack} />
+            : null}
           <script type="text/javascript" src={assets.client.js} defer crossOrigin="anonymous" />
         </body>
       </html>
