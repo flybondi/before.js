@@ -1,56 +1,29 @@
 // @flow strict;
-
-import type { StateOnServer } from 'react-helmet';
+import type { DocumentInitialProps, Context, Extractor } from 'Document.component';
 import React, { PureComponent } from 'react';
 import { F, identity } from 'ramda';
 import Error from './Error.component';
 import serialize from 'serialize-javascript';
 
-export type DocumentProps = {
-  helmet: StateOnServer,
-  assets: {
-    client: {
-      css: ?string,
-      js: ?string
-    }
-  },
-  data: any,
-  title: ?string,
-  error?: Error,
-  errorComponent?: React$ElementType | React$ComponentType<any>,
-  filterServerData: (data: { [key: string]: any }) => { [key: string]: any },
-  criticalCSS: React$Node | false
-};
+const getScriptTags = (extractor: Extractor) => [
+  ...extractor.getStyleTags(),
+  ...extractor.getStyleElements(),
+  ...extractor.getLinkElements()
+];
 
-export type DocumentInitialProps = {
-  [key: string]: any,
-  assets: {
-    client: {
-      css: ?string,
-      js: ?string
-    }
-  },
-  data: any,
-  title?: string,
-  error?: Error,
-  errorComponent?: React$ElementType | React$ComponentType<any>,
-  filterServerData: (data: { [key: string]: any }) => { [key: string]: any },
-  renderPage: (data: { [key: string]: any }) => Promise<any>,
-  generateCriticalCSS: () => React$Node | false
-};
-
-export class Document extends PureComponent<DocumentProps> {
+export class Document extends PureComponent<DocumentInitialProps> {
   static async getInitialProps({
     assets,
     data,
     renderPage,
     generateCriticalCSS = F,
     title,
+    extractor,
     ...rest
-  }: DocumentInitialProps): Promise<DocumentProps> {
+  }: Context): Promise<DocumentInitialProps> {
     const page = await renderPage(data);
     const criticalCSS = generateCriticalCSS();
-    return { assets, criticalCSS, data, title, ...rest, ...page };
+    return { assets, criticalCSS, data, title, extractor, ...rest, ...page };
   }
 
   render() {
@@ -62,7 +35,8 @@ export class Document extends PureComponent<DocumentProps> {
       title,
       error,
       errorComponent: ErrorComponent,
-      filterServerData = identity
+      filterServerData = identity,
+      extractor
     } = this.props;
     // get attributes from React Helmet
     const htmlAttrs = helmet.htmlAttributes.toComponent();
@@ -78,15 +52,21 @@ export class Document extends PureComponent<DocumentProps> {
           {helmet.title.toComponent()}
           {helmet.meta.toComponent()}
           {helmet.link.toComponent()}
+          {helmet.script.toComponent()}
+          {extractor && getScriptTags(extractor)}
           {criticalCSS !== false && criticalCSS}
           {assets.client.css && <link rel="stylesheet" href={assets.client.css} />}
         </head>
         <body {...bodyAttrs}>
           <Root />
           <Data data={filterServerData(data)} />
-          {error
-            ? ErrorComponent ? <ErrorComponent error={error} /> : <Error message={error.message} stack={error.stack} />
-            : null}
+          {error ? (
+            ErrorComponent ? (
+              <ErrorComponent error={error} />
+            ) : (
+              <Error message={error.message} stack={error.stack} />
+            )
+          ) : null}
           <script type="text/javascript" src={assets.client.js} defer crossOrigin="anonymous" />
         </body>
       </html>
@@ -96,7 +76,7 @@ export class Document extends PureComponent<DocumentProps> {
 
 export const Root = () => <div id="root">BEFORE.JS-DATA</div>;
 
-export const Data = ({ data }: any) => (
+export const Data = ({ data }: { data: { [key: string]: any } }) => (
   <script
     id="server-app-state"
     type="application/json"
