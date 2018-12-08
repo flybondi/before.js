@@ -1,4 +1,4 @@
-// @flow strict;
+// @flow strict
 import { anyPass, equals, is, complement } from 'ramda';
 
 const isNull = equals(null);

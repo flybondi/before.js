@@ -1,16 +1,7 @@
 // @flow strict;
 
 import React, { Component } from 'react';
-import {
-  Switch,
-  Route,
-  withRouter,
-  type Location,
-  type Match,
-  type RouterHistory,
-  type RouteProps,
-  type ContextRouter
-} from 'react-router-dom';
+import { Switch, Route, withRouter, type Location, type ContextRouter } from 'react-router-dom';
 import {
   fetchInitialPropsFromRoute,
   getInitialPropsFromComponent
@@ -20,31 +11,6 @@ import { isClientSide } from './utils';
 type State = {
   previousLocation: ?Location,
   data: any
-};
-
-declare class BeforeComponent<TProps, TState> extends React$Component<TProps, TState> {
-  default?: BeforeComponent<TProps, TState>;
-  getInitialProps: (data: any) => Promise<any | Error>;
-  load: () => Promise<BeforeComponent<TProps, TState>>;
-}
-
-export type BeforeRoute<TProps, TState> = {
-  ...RouteProps,
-  component: BeforeComponent<TProps, TState>,
-  redirectTo?: string,
-  prefetch?: boolean,
-  isExact: boolean,
-  params: { [key: string]: ?string },
-  url: string
-};
-
-type Props = {
-  [key: string]: any,
-  data: any,
-  location: Location,
-  match: Match,
-  routes: Array<BeforeRoute<any, any>>,
-  history: RouterHistory
 };
 
 const throwError = (error: Error) => {
@@ -67,7 +33,7 @@ const getDataFromStore = (key: string) => {
   return data ? JSON.parse(data) : null;
 };
 
-const setDataIntoStore = (route: BeforeRoute<any, any>) => (data: any) => {
+const setDataIntoStore = (route: any) => (data: any) => {
   if (route && data) {
     const { path } = route;
     const { hostname } = window.location;
@@ -75,7 +41,7 @@ const setDataIntoStore = (route: BeforeRoute<any, any>) => (data: any) => {
   }
 };
 
-class Before extends Component<Props, State> {
+class Before extends Component<any, State> {
   state = {
     previousLocation: this.props.location,
     data: this.props.data
@@ -95,7 +61,7 @@ class Before extends Component<Props, State> {
     isClientSide() && this.prefetchInitialPropsFromAllRoutes();
   }
 
-  componentDidUpdate(prevProps: Props) {
+  componentDidUpdate(prevProps: any) {
     if (isClientSide() && prevProps.location !== this.props.location) {
       const { history, location, routes, ...rest } = this.props;
       const notPrefetchedRoutes = routes.filter(r => !r.prefetch);
@@ -115,7 +81,7 @@ class Before extends Component<Props, State> {
     }
   }
 
-  shouldComponentUpdate(nextProps: Props, nextState: State) {
+  shouldComponentUpdate(nextProps: any, nextState: State) {
     return nextState.previousLocation !== null;
   }
 

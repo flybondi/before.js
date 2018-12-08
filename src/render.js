@@ -1,62 +1,65 @@
+//
+// The customRenderer parameter is a (potentially async) function that can be set to return more than just a rendered string.
+// If present, it will be used instead of the default ReactDOMServer renderToString function.
+// It has to return an object of shape { html, ... }, in which html will be used as the rendered string
+// Other props will be also pass to the Document component
+//
 // @flow strict;
-import React from 'react';
-import ReactDOMServer from 'react-dom/server';
-import Helmet from 'react-helmet';
-import { StaticRouter } from 'react-router-dom';
-import Before, { type BeforeRoute } from './Before.component';
-import { Document as DefaultDoc, type DocumentProps } from './Document.component';
+import type { Extractor, PageProps, Renderer, RenderOptions, Route } from 'render';
+import { ChunkExtractor } from '@loadable/server';
+import { Document as DefaultDoc } from './Document.component';
 import { fetchInitialPropsFromRoute } from './fetchInitialPropsFromRoute';
 import { isError, isPromise } from './utils';
 import { parse } from 'url';
+import { StaticRouter } from 'react-router-dom';
+import Before from './Before.component';
+import Helmet from 'react-helmet';
+import path from 'path';
+import React from 'react';
+import ReactDOMServer from 'react-dom/server';
 
-/*
- The customRenderer parameter is a (potentially async) function that can be set to return more than just a rendered string.
- If present, it will be used instead of the default ReactDOMServer renderToString function.
- It has to return an object of shape { html, ... }, in which html will be used as the rendered string
- Other props will be also pass to the Document component
-  */
-
-type Renderer = (element: React$Node) => {| html: string |};
-type ParseDocument = (
-  Document: typeof DefaultDoc | React$ComponentType<DocumentProps>,
-  docProps: DocumentProps,
-  html: string
-) => string;
-export type BeforeRenderProps<T> = {
-  req: {
-    [key: string]: ?any,
-    url: string,
-    originalUrl: string
-  },
-  res: {
-    [key: string]: ?any,
-    status: (code: number) => void,
-    redirect: (code: number, to: string) => void
-  },
-  assets: any,
-  customRenderer?: Renderer,
-  routes: Array<BeforeRoute<any, any>>,
-  document: typeof DefaultDoc | React$ComponentType<T>,
-  filterServerData: (data: { [key: string]: any }) => { [key: string]: any },
-  generateCriticalCSS: () => React$Node | false
-};
-
-const parseDocument: ParseDocument = (Document, docProps, html) => {
+/**
+ * Similar to renderToString, except this doesn't create extra DOM attributes such as data-reactid,
+ * that React uses internally. This is useful if you want to use React as a simple static page generator,
+ * as stripping away the extra attributes can save lots of bytes.
+ * Finally, replace the `BEFORE.JS-DATA` with the result of the _renderToStaticMarkup_.
+ * @param {React$PureComponent} Document a react PureComponent
+ * @param {object} docProps Document props object
+ * @param {string} html initial HTML
+ */
+const parseDocument = (Document, docProps, html) => {
   const doc = ReactDOMServer.renderToStaticMarkup(<Document {...docProps} />);
   return `<!doctype html>` + doc.replace('BEFORE.JS-DATA', html);
 };
 
+/**
+ * Render a React element to its initial HTML.
+ * @param {React$Element} element a react element
+ * @returns {object} with given element rendered as an string.
+ */
 const defaultRenderer: Renderer = element => ({
   html: ReactDOMServer.renderToString(element)
 });
 
-const defaultCreatePageComponent = (Page: React$ComponentType<any>) => (props: any) => (
-  <Page {...props} />
-);
+/**
+ * Creates a Page component that will inject given props.
+ * @func
+ * @param {React$ComponentType} Page a react component
+ * @returns {function} that will inject given props into the Page component.
+ */
+const defaultCreatePageComponent = Page => (props: PageProps) => <Page {...props} />;
 
+/**
+ * Renders given routes with given render function.
+ *
+ * @param {string} url an string that represents the url location
+ * @param {array} routes an array of routes
+ * @param {function} renderer custom renderer function
+ * @param {object} context StaticRouter context object
+ */
 const createRenderPage = (
   url: string,
-  routes: Array<BeforeRoute<any, any>>,
+  routes: Array<Route>,
   renderer: Renderer = defaultRenderer,
   context = {}
 ) => async (data, createPageComponent = defaultCreatePageComponent) => {
@@ -74,23 +77,61 @@ const createRenderPage = (
   return { helmet, ...renderedContent };
 };
 
+/**
+ * Creates a new instance of ChunkExtractor if given path is defined.
+ *
+ * @func
+ * @param {string} statsPath
+ * @returns {object | null} instance of ChunkExtractor
+ */
+const getExtractor = (statsPath: ?string): ?Extractor => {
+  let extractor = null;
+  if (statsPath) {
+    const statsFile = path.resolve(statsPath);
+    extractor = new ChunkExtractor({ statsFile });
+  }
+
+  return extractor;
+};
+
+/**
+ * Function that will try to retrieve the intial props for the route that is trying
+ * to render. Catch any error that will happen during the render process or even fetching
+ * the initial route props and will render an error component instead the desire route.
+ *
+ * @param {object} {
+ *   req,
+ *   res,
+ *   routes,
+ *   assets,
+ *   document: Document = DefaultDoc,
+ *   filterServerData,
+ *   generateCriticalCSS,
+ *   customRenderer,
+ *   loadableStatsPath,
+ *   title,
+ *   ...rest
+ * } RenderOptions an object with all options used to render the initial HTML.
+ * @returns {Promise}
+ */
 export async function render({
   req,
   res,
   routes,
   assets,
-  // $FlowFixMe
   document: Document = DefaultDoc,
   filterServerData,
   generateCriticalCSS,
   customRenderer,
+  loadableStatsPath,
+  title,
   ...rest
-}: BeforeRenderProps<DocumentProps>) {
+}: RenderOptions) {
   const { pathname } = parse(req.url);
+  const extractor = getExtractor(loadableStatsPath);
   const renderPage = createRenderPage(req.url, routes, customRenderer);
   let response = {};
   try {
-    // $FlowFixMe
     response = await fetchInitialPropsFromRoute(routes, pathname, {
       req,
       res,
@@ -112,8 +153,8 @@ export async function render({
   if (route.redirectTo) {
     return res.redirect(301, req.originalUrl.replace(route.path, route.redirectTo));
   }
-  // $FlowFixMe
-  const { html, ...docProps } = await Document.getInitialProps({
+
+  const docProps = await Document.getInitialProps({
     req,
     res,
     assets,
@@ -121,10 +162,13 @@ export async function render({
     data,
     filterServerData,
     generateCriticalCSS,
+    title,
+    extractor,
     ...rest,
     error: isError(data) && data,
     match: route
   });
+  const { html } = docProps;
 
   return parseDocument(Document, docProps, html);
 }
