@@ -4,7 +4,7 @@ import babel from 'rollup-plugin-babel';
 import commonjs from 'rollup-plugin-commonjs';
 import flow from 'rollup-plugin-flow';
 import bundleSize from 'rollup-plugin-bundle-size';
-import ramda from 'rollup-plugin-ramda';
+import ramda from '@flybondi/rollup-plugin-ramda';
 import pkg from './package.json';
 
 export default {
@@ -34,7 +34,7 @@ export default {
   ],
   plugins: [
     clean(),
-    flow(),
+    flow({ pretty: true }),
     resolve({
       extensions: ['.js', '.jsx', '.mjs'],
       jsnext: true,
