@@ -1,3 +1,5 @@
+import type { AsyncComponentType } from 'fetchInitialPropsFromRoutes';
+
 declare module 'render' {
   declare type Assets = {
     client: {
@@ -12,13 +14,21 @@ declare module 'render' {
     getLinkElements(): Array<React$Element<'link'>>
   };
 
+  declare type InitialProps = {
+    [key: string]: any
+  };
+
   declare type Route = {
+    component: AsyncComponentType,
     redirectTo?: string,
     prefetch?: boolean,
     isExact: boolean,
     params: { [key: string]: ?string },
     url: string,
-    path: string
+    path?: string,
+    sensitive?: boolean,
+    strict?: boolean,
+    exact?: boolean
   };
 
   declare type DataType = {
@@ -30,17 +40,8 @@ declare module 'render' {
     [key: string]: any
   };
 
-  declare type Context = {
-    req: Request,
-    res: Response,
-    assets: Assets,
-    data: ?DataType,
-    filterServerData: (data: ?DataType) => DataType,
-    renderPage(data: ?DataType): Promise<Page>,
-    generateCriticalCSS(): string | boolean,
-    title: string,
-    extractor: ?Extractor,
-    [key: string]: any
+  declare type LocationType = {
+    search: string
   };
 
   declare type TagMethods = {
@@ -89,11 +90,13 @@ declare module 'render' {
     static getInitialProps(context: Context): Promise<DocumentInitialProps>;
   }
 
+  declare type QueryType = {
+    [key: string]: string
+  };
+
   declare type Request = {
     url: string,
-    query: {
-      [key: string]: string
-    },
+    query: QueryType,
     originalUrl: string,
     [key: string]: any
   };
@@ -130,6 +133,20 @@ declare module 'render' {
     customRenderer: Renderer,
     title: string,
     loadableStatsPath: string,
+    [key: string]: any
+  };
+
+  declare type Context = {
+    req: Request,
+    res: Response,
+    assets: Assets,
+    data: ?DataType,
+    filterServerData: (data: ?DataType) => DataType,
+    renderPage(data: ?DataType): Promise<Page>,
+    generateCriticalCSS(): string | boolean,
+    title: string,
+    extractor: ?Extractor,
+    location?: LocationType,
     [key: string]: any
   };
 

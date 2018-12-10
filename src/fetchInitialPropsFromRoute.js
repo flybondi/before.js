@@ -1,5 +1,5 @@
 // @flow strict;
-import type { AsyncComponentType, Context, Route } from 'fetchInitialPropsFromRoutes';
+import type { TestComponentType, Context, Route } from 'fetchInitialPropsFromRoutes';
 import { matchPath, type Match } from 'react-router-dom';
 import { complement, has, find, isNil } from 'ramda';
 import { parse } from 'query-string';
@@ -50,8 +50,22 @@ const defaultContext = {
     search: ''
   },
   req: {
-    query: {}
+    query: {},
+    originalUrl: '',
+    url: ''
   }
+};
+
+/**
+ * Retrieve the querystring value from the location object if we are in the client or
+ * from the request query if we are in the server.
+ * @param {Location} location a request location object
+ * @param {Request} req a request object
+ * @returns {string}
+ */
+const getQueryString = (location = {}, { query }) => {
+  const { search } = location;
+  return isClientSide() ? parse(search) : query;
 };
 
 /**
@@ -62,14 +76,14 @@ const defaultContext = {
  * @returns {object|null}
  */
 export const getInitialPropsFromComponent = async (
-  component: AsyncComponentType,
+  component: TestComponentType,
   match: ?Match,
   context: Context = defaultContext
 ) => {
   if (match && hasGetInitialProps(component)) {
     const location = isNotNil(context.location) ? context.location : { search: '' };
     const req = isNotNil(context.req) ? context.req : { query: {} };
-    const querystring = isClientSide() ? parse(location.search) : req.query;
+    const querystring = getQueryString(location, req);
     try {
       if (hasLoad(component)) {
         await component.load();
@@ -117,7 +131,7 @@ export async function fetchInitialPropsFromRoute(
   }
 
   return {
-    route: null,
-    data: null
+    route: {},
+    data: {}
   };
 }

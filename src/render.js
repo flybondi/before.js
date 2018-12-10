@@ -4,19 +4,29 @@
 // It has to return an object of shape { html, ... }, in which html will be used as the rendered string
 // Other props will be also pass to the Document component
 //
-// @flow strict;
+// @flow strict
 import type { Extractor, PageProps, Renderer, RenderOptions, Route } from 'render';
 import { ChunkExtractor } from '@loadable/server';
 import { Document as DefaultDoc } from './Document.component';
 import { fetchInitialPropsFromRoute } from './fetchInitialPropsFromRoute';
 import { isError, isPromise } from './utils';
-import { parse } from 'url';
+import { URL } from 'url';
+import { complement, isEmpty } from 'ramda';
 import { StaticRouter } from 'react-router-dom';
 import Before from './Before.component';
 import Helmet from 'react-helmet';
 import path from 'path';
 import React from 'react';
 import ReactDOMServer from 'react-dom/server';
+
+/**
+ * Check if given value if defined.
+ *
+ * @func
+ * @param {any} value to check
+ * @returns {boolean}
+ */
+const isNotEmpty = complement(isEmpty);
 
 /**
  * Similar to renderToString, except this doesn't create extra DOM attributes such as data-reactid,
@@ -127,7 +137,7 @@ export async function render({
   title,
   ...rest
 }: RenderOptions) {
-  const { pathname } = parse(req.url);
+  const { pathname } = new URL(req.url);
   const extractor = getExtractor(loadableStatsPath);
   const renderPage = createRenderPage(req.url, routes, customRenderer);
   let response = {};
@@ -146,12 +156,14 @@ export async function render({
   }
   const { route, data } = response;
 
-  if (route.path === '**') {
-    return res.status(404);
-  }
+  if (isNotEmpty(route)) {
+    if (route.path === '**') {
+      return res.status(404);
+    }
 
-  if (route.redirectTo) {
-    return res.redirect(301, req.originalUrl.replace(route.path, route.redirectTo));
+    if (route.redirectTo && route.path) {
+      return res.redirect(301, req.originalUrl.replace(route.path, route.redirectTo));
+    }
   }
 
   const docProps = await Document.getInitialProps({

@@ -21,10 +21,12 @@ declare module 'fetchInitialPropsFromRoutes' {
     static load(): Promise<React$Node>;
   }
 
-  declare type AsyncComponentType = Class<AsyncComponent>;
+  declare type AsyncComponentType = typeof AsyncComponent;
+
+  declare type TestComponentType = Class<AsyncComponent> | typeof AsyncComponent;
 
   declare type Route = {
-    component: AsyncComponentType,
+    component: TestComponentType,
     redirectTo?: string,
     prefetch?: boolean,
     isExact: boolean,
@@ -54,9 +56,15 @@ declare module 'fetchInitialPropsFromRoutes' {
   };
 
   declare type Request = {
-    url?: string,
+    url: string,
     query: QueryType,
-    originalUrl?: string,
+    originalUrl: string,
+    [key: string]: any
+  };
+
+  declare type Response = {
+    status(code: number): void,
+    redirect(code: number, redirectTo: string): void,
     [key: string]: any
   };
 
@@ -70,17 +78,20 @@ declare module 'fetchInitialPropsFromRoutes' {
     generateCriticalCSS?: () => string | boolean,
     title?: string,
     extractor?: ?Extractor,
-    location: LocationType,
+    location?: LocationType,
     [key: string]: any
   };
 
-  declare type Response = {
-    status(code: number): void,
-    redirect(code: number, redirectTo: string): void,
-    [key: string]: any
+  declare type Props = {
+    data: Error | DataType | null,
+    route: Route | null
   };
 
   declare module.exports: {
-    fetchInitialPropsFromRoute(routes: Array<Route>, pathname: string, context: ?Context): string
+    fetchInitialPropsFromRoute(
+      routes: Array<Route>,
+      pathname: string,
+      context: ?Context
+    ): Promise<Props>
   };
 }
