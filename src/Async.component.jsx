@@ -1,5 +1,5 @@
-// @flow strict;
-import type { AsyncOptions } from 'Async.component';
+// @flow strict
+import type { AsyncOptions, AsyncProps, Context } from 'Async.component';
 import React from 'react';
 import loadable from '@loadable/component';
 
@@ -13,14 +13,14 @@ import loadable from '@loadable/component';
  */
 export function asyncComponent({ loader, Placeholder }: AsyncOptions) {
   let Component = null; // keep Component in a closure to avoid doing this stuff more than once
-  const AsyncRouteComponent = (props: any) => <Component {...this.props} />;
+  const AsyncRouteComponent = (props: AsyncProps) => Component && <Component {...props} />;
 
   AsyncRouteComponent.load = async () => {
     Component = loadable(loader(), { fallback: Placeholder });
     return Promise.resolve(Component);
   };
 
-  AsyncRouteComponent.getInitialProps = context =>
+  AsyncRouteComponent.getInitialProps = async (context: Context) =>
     Component !== null && Component.getInitialProps
       ? Component.getInitialProps(context)
       : Promise.resolve(null);

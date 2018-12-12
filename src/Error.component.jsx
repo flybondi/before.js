@@ -1,15 +1,15 @@
 // @flow strict
+import type { ErrorProps } from 'Error.component';
 import React from 'react';
 
 // @NOTE(lf): I'll assume that the user is using tachyons for now. When we open source this, we should
 // change this implementation to use inline styles (maybe?).
 
-type ErrorProps = {|
-  className?: string,
-  message: string,
-  stack: string
-|};
-
+/**
+ * Creates a new react Error component.
+ * @param {object} Props component props
+ * @returns {React$Element<'article'>}
+ */
 const Error = ({ className = 'w-75 center mt6', message, stack }: ErrorProps) => (
   <article className={className}>
     <span className="tc w-100 db" style={{ fontSize: '120px' }} role="img" aria-label="scream">

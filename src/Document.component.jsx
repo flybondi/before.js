@@ -1,5 +1,5 @@
-// @flow strict;
-import type { DocumentInitialProps, Context, Extractor } from 'Document.component';
+// @flow strict
+import type { DocumentInitialProps, Context, Extractor, DataType } from 'Document.component';
 import React, { PureComponent } from 'react';
 import { F, identity } from 'ramda';
 import Error from './Error.component';
@@ -11,7 +11,7 @@ const getScriptTags = (extractor: Extractor) => [
   ...extractor.getLinkElements()
 ];
 
-export class Document extends PureComponent<DocumentInitialProps> {
+export class DocumentComponent extends PureComponent<DocumentInitialProps> {
   static async getInitialProps({
     assets,
     data,
@@ -76,7 +76,7 @@ export class Document extends PureComponent<DocumentInitialProps> {
 
 export const Root = () => <div id="root">BEFORE.JS-DATA</div>;
 
-export const Data = ({ data }: { data: { [key: string]: any } }) => (
+export const Data = ({ data }: { data: DataType }) => (
   <script
     id="server-app-state"
     type="application/json"

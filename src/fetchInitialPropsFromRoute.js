@@ -1,5 +1,5 @@
-// @flow strict;
-import type { TestComponentType, Context, Route } from 'fetchInitialPropsFromRoutes';
+// @flow strict
+import type { AsyncFixMeComponentType, Context, Route } from 'fetchInitialPropsFromRoutes';
 import { matchPath, type Match } from 'react-router-dom';
 import { complement, has, find, isNil } from 'ramda';
 import { parse } from 'query-string';
@@ -47,7 +47,9 @@ const hasLoad = has('load');
 
 const defaultContext = {
   location: {
-    search: ''
+    hash: '',
+    search: '',
+    pathname: ''
   },
   req: {
     query: {},
@@ -71,13 +73,13 @@ const getQueryString = (location = {}, { query }) => {
 /**
  * Retrieve the initial props from given component.
  * @param {React$PureComponent} component to fetch the initial props
- * @param {Match} match react-router match object
+ * @param {Match|Route} match react-router match or route object
  * @param {object} context
  * @returns {object|null}
  */
 export const getInitialPropsFromComponent = async (
-  component: TestComponentType,
-  match: ?Match,
+  component: AsyncFixMeComponentType,
+  match: ?Match | ?Route,
   context: Context = defaultContext
 ) => {
   if (match && hasGetInitialProps(component)) {

@@ -5,9 +5,9 @@
 // Other props will be also pass to the Document component
 //
 // @flow strict
-import type { Extractor, PageProps, Renderer, RenderOptions, Route } from 'render';
+import type { Extractor, PageProps, Renderer, RenderOptions, Request, Route } from 'render';
 import { ChunkExtractor } from '@loadable/server';
-import { Document as DefaultDoc } from './Document.component';
+import { DocumentComponent as DefaultDoc } from './Document.component';
 import { fetchInitialPropsFromRoute } from './fetchInitialPropsFromRoute';
 import { isError, isPromise } from './utils';
 import { URL } from 'url';
@@ -57,25 +57,28 @@ const defaultRenderer: Renderer = element => ({
  * @param {React$ComponentType} Page a react component
  * @returns {function} that will inject given props into the Page component.
  */
-const defaultCreatePageComponent = Page => (props: PageProps) => <Page {...props} />;
+const defaultCreatePageComponent = (Page: typeof Before) => (props: PageProps) => (
+  // $FlowFixMe
+  <Page {...props} />
+);
 
 /**
  * Renders given routes with given render function.
  *
- * @param {string} url an string that represents the url location
+ * @param {object} req an string that represents the url location
  * @param {array} routes an array of routes
  * @param {function} renderer custom renderer function
  * @param {object} context StaticRouter context object
  */
 const createRenderPage = (
-  url: string,
+  req: Request,
   routes: Array<Route>,
   renderer: Renderer = defaultRenderer,
   context = {}
 ) => async (data, createPageComponent = defaultCreatePageComponent) => {
   const asyncOrSyncRender = renderer(
-    <StaticRouter location={url} context={context}>
-      {createPageComponent(Before)({ routes, data })}
+    <StaticRouter location={req.url} context={context}>
+      {createPageComponent(Before)({ routes, data, req })}
     </StaticRouter>
   );
 
@@ -139,7 +142,7 @@ export async function render({
 }: RenderOptions) {
   const { pathname } = new URL(req.url);
   const extractor = getExtractor(loadableStatsPath);
-  const renderPage = createRenderPage(req.url, routes, customRenderer);
+  const renderPage = createRenderPage(req, routes, customRenderer);
   let response = {};
   try {
     response = await fetchInitialPropsFromRoute(routes, pathname, {
