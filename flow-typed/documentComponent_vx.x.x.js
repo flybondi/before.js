@@ -73,12 +73,13 @@ declare module 'Document.component' {
     [key: string]: any
   };
 
-  declare class Document extends React$PureComponent<DocumentInitialProps> {
+  declare class DocumentComponent extends React$PureComponent<DocumentInitialProps> {
     static getInitialProps(context: Context): Promise<DocumentInitialProps>;
+    render(): React$Element<'html'>;
   }
 
   declare module.exports: {
-    Document: typeof Document,
+    DocumentComponent: typeof DocumentComponent,
     Root: () => React$Element<'div'>,
     Data: (arg: { data: DataType }) => React$Element<'script'>
   };

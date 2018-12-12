@@ -1,14 +1,21 @@
-declare module 'Async.component' {
-  declare type DataType = {
-    [key: any]: any
-  };
+type Window = {
+  location: {
+    pathname: string
+  }
+};
 
-  declare type LocationType = {
-    hash: string,
-    key?: string,
-    pathname: string,
-    search: string,
-    state?: any
+type Reviver = (key: string | number, value: any) => any;
+
+type JSONType = {|
+  parse(text: string, reviver?: Reviver): { [key: any]: any }
+|};
+
+declare module 'ensureReady' {
+  declare var window: Window;
+  declare var JSON: JSONType;
+
+  declare type DataType = {
+    [key: string]: any
   };
 
   declare type InitialProps = {
@@ -39,6 +46,14 @@ declare module 'Async.component' {
     }
   };
 
+  declare type LocationType = {
+    hash: string,
+    key?: string,
+    pathname: string,
+    search: string,
+    state?: any
+  };
+
   declare type Extractor = {
     getStyleTags(): Array<React$Element<'link'>>,
     getStyleElements(): Array<React$Element<'link'>>,
@@ -64,25 +79,26 @@ declare module 'Async.component' {
     [key: string]: any
   };
 
-  declare type AsyncProps = {
-    [key: string]: any
-  };
+  declare class AsyncComponent extends React$PureComponent<InitialProps> {
+    static getInitialProps(context: Context): Promise<InitialProps | Error>;
+    static load(): Promise<React$Node>;
+  }
 
-  declare type AsyncRouteComponent<T> = React$ComponentType<T> & {
-    load: () => Promise<React$Node>,
-    getInitialProps: (context: Context) => Promise<AsyncProps>
-  };
-
-  declare type ComponentType<P> = React$ComponentType<P> & {
-    getInitialProps(context: Context): Promise<DataType>
-  };
-
-  declare type AsyncOptions = {
-    loader(): Promise<ComponentType<AsyncProps>>,
-    Placeholder: ?React$Node
+  declare type Route = {
+    component: Class<AsyncComponent> | typeof AsyncComponent,
+    redirectTo?: string,
+    prefetch?: boolean,
+    isExact: boolean,
+    params: { [key: string]: ?string },
+    url: string,
+    path?: string,
+    sensitive?: boolean,
+    strict?: boolean,
+    exact?: boolean
   };
 
   declare module.exports: {
-    asyncComponent(opts: AsyncOptions): (props: AsyncProps) => AsyncRouteComponent<AsyncProps>
+    ensureReady: (routes: Array<Route>, pathname: string) => Promise<DataType>,
+    ensureClientReady: (rootFn: () => void) => Promise<void>
   };
 }

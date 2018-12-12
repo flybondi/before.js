@@ -157,7 +157,7 @@ declare module "react-router-dom" {
     location?: Location
   |}>>
 
-  declare export function withRouter<WrappedComponent: ComponentType<*>>(
+  declare export function withRouter<WrappedComponent>(
     Component: WrappedComponent
   ): ComponentType<
     $Diff<ElementConfig<$Supertype<WrappedComponent>>, ContextRouterVoid>

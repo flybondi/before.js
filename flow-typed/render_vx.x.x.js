@@ -1,6 +1,7 @@
-import type { AsyncComponentType } from 'fetchInitialPropsFromRoutes';
-
 declare module 'render' {
+  import type { AsyncComponentType } from 'fetchInitialPropsFromRoutes';
+  import typeof { DocumentComponent } from 'Document.component';
+
   declare type Assets = {
     client: {
       css: string,
@@ -41,7 +42,11 @@ declare module 'render' {
   };
 
   declare type LocationType = {
-    search: string
+    hash: string,
+    key?: string,
+    pathname: string,
+    search: string,
+    state?: any
   };
 
   declare type TagMethods = {
@@ -70,26 +75,6 @@ declare module 'render' {
     error: Error
   };
 
-  declare type DocumentInitialProps = {
-    assets: Assets,
-    criticalCSS: boolean | string,
-    data: ?DataType,
-    renderPage: (data: { [key: string]: any }) => Promise<any>,
-    generateCriticalCSS: () => string | boolean,
-    title: string,
-    extractor: ?Extractor,
-    helmet: Helmet,
-    error: Error,
-    errorComponent: React$ComponentType<ErrorProps>,
-    filterServerData: (data: ?DataType) => DataType,
-    html: string,
-    [key: string]: any
-  };
-
-  declare class Document extends React$PureComponent<DocumentInitialProps> {
-    static getInitialProps(context: Context): Promise<DocumentInitialProps>;
-  }
-
   declare type QueryType = {
     [key: string]: string
   };
@@ -115,7 +100,8 @@ declare module 'render' {
 
   declare type PageProps = {
     routes: Array<Route>,
-    data: ?DataType
+    data: ?DataType,
+    req: Request
   };
 
   declare type CreatePageComponent = <T>(
@@ -127,7 +113,7 @@ declare module 'render' {
     res: Response,
     routes: Array<Route>,
     assets: Assets,
-    document: Class<Document>,
+    document: DocumentComponent,
     filterServerData(?DataType): DataType,
     generateCriticalCSS(): string | boolean,
     customRenderer: Renderer,

@@ -21,12 +21,12 @@ declare module 'fetchInitialPropsFromRoutes' {
     static load(): Promise<React$Node>;
   }
 
-  declare type AsyncComponentType = typeof AsyncComponent;
-
-  declare type TestComponentType = Class<AsyncComponent> | typeof AsyncComponent;
+  // fixme(lf): I don't why this one is not working.
+  declare type AsyncComponentType = Class<AsyncComponent> | typeof AsyncComponent;
+  declare type AsyncFixMeComponentType = Class<AsyncComponent> | typeof AsyncComponent;
 
   declare type Route = {
-    component: TestComponentType,
+    component: AsyncFixMeComponentType,
     redirectTo?: string,
     prefetch?: boolean,
     isExact: boolean,
@@ -48,7 +48,11 @@ declare module 'fetchInitialPropsFromRoutes' {
   };
 
   declare type LocationType = {
-    search: string
+    hash: string,
+    key?: string,
+    pathname: string,
+    search: string,
+    state?: any
   };
 
   declare type QueryType = {
@@ -68,6 +72,24 @@ declare module 'fetchInitialPropsFromRoutes' {
     [key: string]: any
   };
 
+  declare type HistoryAction = 'PUSH' | 'REPLACE' | 'POP';
+
+  declare type RouterHistory = {
+    length: number,
+    location: LocationType,
+    action: HistoryAction,
+    listen(callback: (location: LocationType, action: HistoryAction) => void): () => void,
+    push(path: string | LocationType, state?: any): void,
+    replace(path: string | LocationType, state?: any): void,
+    go(n: number): void,
+    goBack(): void,
+    goForward(): void,
+    canGo?: (n: number) => boolean,
+    block(callback: (location: LocationType, action: HistoryAction) => boolean): void,
+    index?: number,
+    entries?: Array<LocationType>
+  };
+
   declare type Context = {
     req: Request,
     res?: Response,
@@ -79,6 +101,7 @@ declare module 'fetchInitialPropsFromRoutes' {
     title?: string,
     extractor?: ?Extractor,
     location?: LocationType,
+    history?: RouterHistory,
     [key: string]: any
   };
 
