@@ -140,7 +140,8 @@ export async function render({
   title,
   ...rest
 }: RenderOptions) {
-  const { pathname } = new URL(req.url);
+  // @NOTE(lf): Not sure is the originalUrl is the right property to use. Maybe will be originalUrl + url;
+  const { pathname } = new URL(req.originalUrl);
   const extractor = getExtractor(loadableStatsPath);
   const renderPage = createRenderPage(req, routes, customRenderer);
   let response = {};

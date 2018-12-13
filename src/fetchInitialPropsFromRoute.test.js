@@ -9,7 +9,7 @@ beforeEach(() => {
   jest.clearAllMocks();
 });
 
-test('should return null if the pathname is invalid', async () => {
+test('should return an empty object if the pathname is invalid', async () => {
   const DummyComponent = () => <span>Hi there!</span>;
   const mockLoader = jest.fn().mockResolvedValue(DummyComponent);
   const mockRoutes = [
@@ -21,9 +21,9 @@ test('should return null if the pathname is invalid', async () => {
   ];
 
   const props = await fetchInitialPropsFromRoute(mockRoutes, '/test-pathname');
-  expect(mockLoader).not.toHaveBeenCalled();
-  expect(props).toHaveProperty('route', null);
-  expect(props).toHaveProperty('data', null);
+  expect(mockLoader).toHaveBeenCalled();
+  expect(props).toHaveProperty('route', {});
+  expect(props).toHaveProperty('data', {});
 });
 
 test('should return a Match value but without data', async () => {
@@ -76,7 +76,6 @@ test('should load an async component and fetch their initial props', async () =>
     req: {},
     res: {}
   };
-
   const props = await fetchInitialPropsFromRoute(mockRoutes, '/', mockContext);
   expect(mockLoader).toHaveBeenCalled();
   expect(DummyComponent.getInitialProps).toHaveBeenCalledWith({
@@ -115,6 +114,16 @@ test('should fetch initial props from matched route component', async () => {
     match: {
       ...mockMatch,
       querystring: {}
+    },
+    location: {
+      hash: '',
+      pathname: '',
+      search: ''
+    },
+    req: {
+      originalUrl: '',
+      query: {},
+      url: ''
     }
   });
   expect(props).toHaveProperty('route', { ...mockMatch, ...mockRoutes[0] });
@@ -293,6 +302,16 @@ test('should throw an error while fetching initial props from matched route comp
       match: {
         ...mockMatch,
         querystring: {}
+      },
+      location: {
+        hash: '',
+        pathname: '',
+        search: ''
+      },
+      req: {
+        originalUrl: '',
+        query: {},
+        url: ''
       }
     });
     expect(error).toHaveProperty('message', 'mock error');
@@ -328,6 +347,16 @@ test('should throw an error while fetching initial props from matched async rout
       match: {
         ...mockMatch,
         querystring: {}
+      },
+      location: {
+        hash: '',
+        pathname: '',
+        search: ''
+      },
+      req: {
+        originalUrl: '',
+        query: {},
+        url: ''
       }
     });
     expect(error).toHaveProperty('message', 'mock async error');

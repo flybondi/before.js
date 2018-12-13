@@ -4,7 +4,7 @@
 
 import React from 'react';
 import { mount } from 'enzyme';
-import { Document } from './Document.component';
+import { DocumentComponent as Document } from './Document.component';
 
 test('should render the server-app-state', () => {
   const documentProps = {
@@ -16,6 +16,9 @@ test('should render the server-app-state', () => {
         toComponent: jest.fn()
       },
       link: {
+        toComponent: jest.fn()
+      },
+      script: {
         toComponent: jest.fn()
       },
       htmlAttributes: {
@@ -62,6 +65,9 @@ test('should filter the server-app-state with the given function', () => {
         toComponent: jest.fn()
       },
       link: {
+        toComponent: jest.fn()
+      },
+      script: {
         toComponent: jest.fn()
       },
       htmlAttributes: {
