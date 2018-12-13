@@ -21,6 +21,7 @@ export function asyncComponent({ loader, Placeholder }: AsyncOptions) {
 
   AsyncRouteComponent.load = async () => {
     return loader().then(component => {
+      // $FlowFixMe I have no idea why is not working, as the type for me (lf) is defined correctly.
       Component = component.default || component;
       return Component;
     });
