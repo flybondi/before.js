@@ -78,7 +78,9 @@ declare module 'Async.component' {
   };
 
   declare type AsyncOptions = {
-    loader(): Promise<ComponentType<AsyncProps>>,
+    loader():
+      | Promise<ComponentType<AsyncProps>>
+      | Promise<{| +default: ComponentType<AsyncProps> |}>,
     Placeholder: ?React$Node
   };
 

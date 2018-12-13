@@ -12,17 +12,26 @@ import loadable from '@loadable/component';
  * @returns {React$Node}
  */
 export function asyncComponent({ loader, Placeholder }: AsyncOptions) {
-  let Component = null; // keep Component in a closure to avoid doing this stuff more than once
-  const AsyncRouteComponent = (props: AsyncProps) => Component && <Component {...props} />;
+  const LoadableComponent = loadable(loader(), { fallback: Placeholder });
+  let Component = null;
+  let initialProps = {};
+  const AsyncRouteComponent = (props: AsyncProps) => (
+    <LoadableComponent {...props} {...initialProps} />
+  );
 
   AsyncRouteComponent.load = async () => {
-    Component = loadable(loader(), { fallback: Placeholder });
-    return Promise.resolve(Component);
+    return loader().then(component => {
+      Component = component.default || component;
+      return Component;
+    });
   };
 
   AsyncRouteComponent.getInitialProps = async (context: Context) =>
     Component !== null && Component.getInitialProps
-      ? Component.getInitialProps(context)
+      ? Component.getInitialProps(context).then(props => {
+          initialProps = props;
+          return props;
+        })
       : Promise.resolve(null);
 
   return AsyncRouteComponent;
