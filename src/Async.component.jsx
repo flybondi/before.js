@@ -1,5 +1,5 @@
 // @flow strict
-import type { AsyncOptions, AsyncProps, Context } from 'Async.component';
+import type { AsyncOptions, AsyncProps, ComponentType, Context } from 'Async.component';
 import React from 'react';
 import loadable from '@loadable/component';
 
@@ -9,7 +9,7 @@ import loadable from '@loadable/component';
  * instance of Component to the static implementation of `load`.
  * @func
  * @param { loader, Placeholder } AsyncOptions
- * @returns {React$Node}
+ * @returns {React.Node}
  */
 export function asyncComponent({ loader, Placeholder }: AsyncOptions) {
   const LoadableComponent = loadable(loader(), { fallback: Placeholder });
@@ -19,9 +19,8 @@ export function asyncComponent({ loader, Placeholder }: AsyncOptions) {
     <LoadableComponent {...props} {...initialProps} />
   );
 
-  AsyncRouteComponent.load = async () => {
+  AsyncRouteComponent.load = async (): Promise<ComponentType<AsyncProps>> => {
     return loader().then(component => {
-      // $FlowFixMe I have no idea why is not working, as the type for me (lf) is defined correctly.
       Component = component.default || component;
       return Component;
     });

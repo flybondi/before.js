@@ -78,9 +78,9 @@ declare module '@loadable/component' {
     fallback: ?React$Node
   };
 
-  declare type LoadableComponent<A> = React$ComponentType<A> & {
+  declare type LoadableComponent<A> = {
     getInitialProps: (context: Context) => Promise<AsyncProps>
-  };
+  } & $Subtype<React$ComponentType<A>>;
 
   declare type Loadable = <A>(loadFn: A, options: Options) => LoadableComponent<*>;
   declare type RootFn = () => void;

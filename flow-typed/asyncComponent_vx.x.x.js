@@ -73,9 +73,9 @@ declare module 'Async.component' {
     getInitialProps: (context: Context) => Promise<AsyncProps>
   };
 
-  declare type ComponentType<P> = React$ComponentType<P> & {
+  declare type ComponentType<P> = {
     getInitialProps(context: Context): Promise<DataType>
-  };
+  } & $Subtype<React$ComponentType<P>>;
 
   declare type AsyncOptions = {
     loader():

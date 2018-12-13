@@ -1,6 +1,6 @@
 declare module 'render' {
   import type { AsyncComponentType } from 'fetchInitialPropsFromRoutes';
-  import typeof { DocumentComponent } from 'Document.component';
+  import type { DocumentComponent } from 'Document.component';
 
   declare type Assets = {
     client: {
