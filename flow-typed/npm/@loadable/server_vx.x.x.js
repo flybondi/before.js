@@ -11,6 +11,8 @@ declare module '@loadable/server' {
     getStyleTags(): Array<React$Element<'link'>>;
     getStyleElements(): Array<React$Element<'link'>>;
     getLinkElements(): Array<React$Element<'link'>>;
+    requireEntrypoint(): { default: React$ComponentType<*> };
+    collectChunks(node: React$ComponentType<*>): string;
   }
 
   declare module.exports: {

@@ -9,7 +9,14 @@ import pkg from './package.json';
 
 export default {
   input: 'index.js',
-  external: ['react', 'react-dom', 'react-router-dom', 'url'],
+  external: [
+    'react',
+    'react-dom',
+    'react-router-dom',
+    'path',
+    '@loadable/server',
+    '@loadable/component'
+  ],
   output: [
     {
       globals: {

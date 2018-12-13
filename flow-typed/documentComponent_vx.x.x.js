@@ -18,7 +18,8 @@ declare module 'Document.component' {
   declare type Extractor = {
     getStyleTags(): Array<React$Element<'link'>>,
     getStyleElements(): Array<React$Element<'link'>>,
-    getLinkElements(): Array<React$Element<'link'>>
+    getLinkElements(): Array<React$Element<'link'>>,
+    getScriptTags(): Array<React$Element<'script'>>
   };
 
   declare type Context = {
@@ -28,6 +29,7 @@ declare module 'Document.component' {
     generateCriticalCSS(): string | boolean,
     title: string,
     extractor: ?Extractor,
+    jsx: ?string,
     [key: string]: any
   };
 
@@ -70,6 +72,7 @@ declare module 'Document.component' {
     errorComponent: React$ComponentType<ErrorProps>,
     filterServerData: (data: DataType) => DataType,
     html: string,
+    jsx: ?string,
     [key: string]: any
   };
 
@@ -79,7 +82,7 @@ declare module 'Document.component' {
 
   declare module.exports: {
     DocumentComponent: DocumentComponent,
-    Root: () => React$Element<'div'>,
+    Root: (props: { jsx: ?string }) => React$Element<'div'>,
     Data: (arg: { data: DataType }) => React$Element<'script'>
   };
 }

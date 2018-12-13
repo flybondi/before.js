@@ -10,7 +10,6 @@ import { ChunkExtractor } from '@loadable/server';
 import { DocumentComponent as DefaultDoc } from './Document.component';
 import { fetchInitialPropsFromRoute } from './fetchInitialPropsFromRoute';
 import { isError, isPromise } from './utils';
-import { URL } from 'url';
 import { complement, isEmpty } from 'ramda';
 import { StaticRouter } from 'react-router-dom';
 import Before from './Before.component';
@@ -97,15 +96,20 @@ const createRenderPage = (
  * @param {string} statsPath
  * @returns {object | null} instance of ChunkExtractor
  */
-const getExtractor = (statsPath: ?string): ?Extractor => {
+const getExtractor = (statsPath: ?string, entrypoints: string): ?Extractor => {
   let extractor = null;
   if (statsPath) {
     const statsFile = path.resolve(statsPath);
-    extractor = new ChunkExtractor({ statsFile });
+    extractor = new ChunkExtractor({ statsFile, entrypoints });
   }
 
   return extractor;
 };
+
+const getExtractors = ({ node, web }: { node: ?string, web: ?string }) => [
+  getExtractor(node, 'main'),
+  getExtractor(web, 'client')
+];
 
 /**
  * Function that will try to retrieve the intial props for the route that is trying
@@ -136,17 +140,18 @@ export async function render({
   filterServerData,
   generateCriticalCSS,
   customRenderer,
-  loadableStatsPath,
+  loadableStatsPath = {},
   title,
   ...rest
 }: RenderOptions) {
   // @NOTE(lf): Not sure is the originalUrl is the right property to use. Maybe will be originalUrl + url;
-  const { pathname } = new URL(req.originalUrl);
-  const extractor = getExtractor(loadableStatsPath);
+  const { url, originalUrl } = req;
+  const webExtractor = getExtractor(loadableStatsPath.web, 'client');
+
   const renderPage = createRenderPage(req, routes, customRenderer);
   let response = {};
   try {
-    response = await fetchInitialPropsFromRoute(routes, pathname, {
+    response = await fetchInitialPropsFromRoute(routes, url, {
       req,
       res,
       ...rest
@@ -166,9 +171,14 @@ export async function render({
     }
 
     if (route.redirectTo && route.path) {
-      return res.redirect(301, req.originalUrl.replace(route.path, route.redirectTo));
+      return res.redirect(301, originalUrl.replace(route.path, route.redirectTo));
     }
   }
+
+  // if (nodeExtractor && webExtractor) {
+  //   const { default: App } = nodeExtractor.requireEntrypoint();
+  //   jsx = webExtractor.collectChunks(<App />);
+  // }
 
   const docProps = await Document.getInitialProps({
     req,
@@ -179,12 +189,11 @@ export async function render({
     filterServerData,
     generateCriticalCSS,
     title,
-    extractor,
+    extractor: webExtractor,
     ...rest,
     error: isError(data) && data,
     match: route
   });
   const { html } = docProps;
-
-  return parseDocument(Document, docProps, html);
+  return parseDocument(webExtractor.collectChunks(Document), docProps, html);
 }

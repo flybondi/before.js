@@ -5,9 +5,8 @@ import { F, identity } from 'ramda';
 import Error from './Error.component';
 import serialize from 'serialize-javascript';
 
-const getScriptTags = (extractor: Extractor) => [
+const getHeaderTags = (extractor: Extractor) => [
   ...extractor.getStyleTags(),
-  ...extractor.getStyleElements(),
   ...extractor.getLinkElements()
 ];
 
@@ -53,7 +52,7 @@ export class DocumentComponent extends PureComponent<DocumentInitialProps> {
           {helmet.meta.toComponent()}
           {helmet.link.toComponent()}
           {helmet.script.toComponent()}
-          {extractor && getScriptTags(extractor)}
+          {extractor && getHeaderTags(extractor)}
           {criticalCSS !== false && criticalCSS}
           {assets.client.css && <link rel="stylesheet" href={assets.client.css} />}
         </head>
@@ -67,7 +66,7 @@ export class DocumentComponent extends PureComponent<DocumentInitialProps> {
               <Error message={error.message} stack={error.stack} />
             )
           ) : null}
-          <script type="text/javascript" src={assets.client.js} defer crossOrigin="anonymous" />
+          {extractor && extractor.getScriptTags()}
         </body>
       </html>
     );
