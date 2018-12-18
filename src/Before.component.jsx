@@ -134,7 +134,7 @@ export class Before extends Component<BeforeComponentWithRouterProps, BeforeStat
       try {
         const currentRoute = getCurrentRouteByPath(pathname, routes);
         if (currentRoute) {
-          // $FlowFixMe
+          // $FlowFixMe Component
           const data = await getInitialPropsFromComponent(currentRoute.component, currentRoute);
           this.setState(() => ({
             previousLocation: location,

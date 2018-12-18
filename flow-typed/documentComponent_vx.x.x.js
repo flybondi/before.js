@@ -1,4 +1,6 @@
 declare module 'Document.component' {
+  import type { Extractor } from '@loadable/server';
+
   declare type Assets = {
     client: {
       css: string,
@@ -15,13 +17,6 @@ declare module 'Document.component' {
     [key: string]: any
   };
 
-  declare type Extractor = {
-    getStyleTags(): Array<React$Element<'link'>>,
-    getStyleElements(): Array<React$Element<'link'>>,
-    getLinkElements(): Array<React$Element<'link'>>,
-    getScriptTags(): Array<React$Element<'script'>>
-  };
-
   declare type Context = {
     assets: Assets,
     data: ?DataType,
@@ -29,7 +24,6 @@ declare module 'Document.component' {
     generateCriticalCSS(): string | boolean,
     title: string,
     extractor: ?Extractor,
-    jsx: ?string,
     [key: string]: any
   };
 
@@ -72,7 +66,6 @@ declare module 'Document.component' {
     errorComponent: React$ComponentType<ErrorProps>,
     filterServerData: (data: DataType) => DataType,
     html: string,
-    jsx: ?string,
     [key: string]: any
   };
 

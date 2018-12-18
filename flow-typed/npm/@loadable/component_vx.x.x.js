@@ -82,7 +82,7 @@ declare module '@loadable/component' {
     getInitialProps: (context: Context) => Promise<AsyncProps>
   } & $Subtype<React$ComponentType<A>>;
 
-  declare type Loadable = <A>(loadFn: A, options: Options) => LoadableComponent<*>;
+  declare type Loadable = <A>(loadFn: A, options?: Options) => LoadableComponent<*>;
   declare type RootFn = () => void;
 
   declare export default Loadable;

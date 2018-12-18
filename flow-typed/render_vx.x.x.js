@@ -1,20 +1,13 @@
 declare module 'render' {
   import type { AsyncComponentType } from 'fetchInitialPropsFromRoutes';
   import type { DocumentComponent } from 'Document.component';
+  import type { Extractor } from '@loadable/server';
 
   declare type Assets = {
     client: {
       css: string,
       js: string
     }
-  };
-
-  declare type Extractor = {
-    getStyleTags(): Array<React$Element<'link'>>,
-    getStyleElements(): Array<React$Element<'link'>>,
-    getLinkElements(): Array<React$Element<'link'>>,
-    requireEntrypoint(): { default: React$ComponentType<*> },
-    collectChunks(node: React$Element<*>): string
   };
 
   declare type InitialProps = {
@@ -110,11 +103,6 @@ declare module 'render' {
     Page: React$ComponentType<T>
   ) => (props: PageProps) => React$Element<React$ComponentType<PageProps>>;
 
-  declare type LoadableStatsPath = {
-    node: ?string,
-    web: ?string
-  };
-
   declare type RenderOptions = {
     req: Request,
     res: Response,
@@ -125,7 +113,7 @@ declare module 'render' {
     generateCriticalCSS(): string | boolean,
     customRenderer: Renderer,
     title: string,
-    loadableStatsPath: LoadableStatsPath,
+    statsPath: ?string,
     [key: string]: any
   };
 
@@ -140,7 +128,6 @@ declare module 'render' {
     title: string,
     extractor: ?Extractor,
     location?: LocationType,
-    jsx: ?string,
     [key: string]: any
   };
 

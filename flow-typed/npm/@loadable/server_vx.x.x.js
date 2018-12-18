@@ -6,16 +6,32 @@ declare module '@loadable/server' {
     statsFile: string
   };
 
+  declare type Extractor = {
+    getStyleTags(): Array<React$Element<'link'>>,
+    getStyleElements(): Array<React$Element<'link'>>,
+    getScriptElements(): Array<React$Element<'link'>>,
+    getScriptTags(): string,
+    getLinkElements(): Array<React$Element<'link'>>,
+    requireEntrypoint(): { default: React$ComponentType<*> }
+  };
+
+  declare type ChunkExtractorManagerProps = {
+    extractor: Extractor
+  };
+
   declare class ChunkClass {
     constructor(options: ChunkOptions): void;
     getStyleTags(): Array<React$Element<'link'>>;
     getStyleElements(): Array<React$Element<'link'>>;
+    getScriptElements(): Array<React$Element<'link'>>;
+    getScriptTags(): string;
     getLinkElements(): Array<React$Element<'link'>>;
     requireEntrypoint(): { default: React$ComponentType<*> };
     collectChunks(node: React$ComponentType<*>): string;
   }
 
   declare module.exports: {
-    ChunkExtractor: typeof ChunkClass
+    ChunkExtractor: typeof ChunkClass,
+    ChunkExtractorManager: React$ComponentType<ChunkExtractorManagerProps>
   };
 }

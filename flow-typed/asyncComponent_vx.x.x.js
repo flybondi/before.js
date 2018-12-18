@@ -81,7 +81,7 @@ declare module 'Async.component' {
     loader():
       | Promise<ComponentType<AsyncProps>>
       | Promise<{| +default: ComponentType<AsyncProps> |}>,
-    Placeholder: ?React$Node
+    LoadableComponent: React$ComponentType<AsyncProps>
   };
 
   declare module.exports: {
