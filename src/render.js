@@ -127,7 +127,7 @@ const getExtractor = (statsPath: ?string, entrypoints: Array<string>): ?Extracto
  *   filterServerData,
  *   generateCriticalCSS,
  *   customRenderer,
- *   loadableStatsPath,
+ *   statsPath,
  *   title,
  *   ...rest
  * } RenderOptions an object with all options used to render the initial HTML.
@@ -142,15 +142,14 @@ export async function render({
   filterServerData,
   generateCriticalCSS,
   customRenderer,
-  loadableStatsPath,
+  statsPath,
   title,
   ...rest
 }: RenderOptions) {
-  // @NOTE(lf): Not sure is the originalUrl is the right property to use. Maybe will be originalUrl + url;
   const { url, originalUrl } = req;
-  const extractor = getExtractor(loadableStatsPath, ['client']);
+  const extractor = getExtractor(statsPath, ['client']);
 
-  const renderPage = createRenderPage(req, routes, customRenderer, extractor);
+  const renderPage = createRenderPage(req, routes, customRenderer);
   let response = {};
   try {
     response = await fetchInitialPropsFromRoute(routes, url, {
