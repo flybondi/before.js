@@ -23,7 +23,7 @@ test('should use the default document', async () => {
     {
       path: '/',
       exact: true,
-      component: asyncComponent({ loader: mockLoader })
+      component: asyncComponent({ loader: mockLoader, LoadableComponent: DummyComponent })
     }
   ];
   const options = {
@@ -53,7 +53,7 @@ test('should return a 404', async () => {
     {
       path: '**',
       exact: true,
-      component: asyncComponent({ loader: mockLoader })
+      component: asyncComponent({ loader: mockLoader, LoadableComponent: DummyComponent })
     }
   ];
   const options = {
@@ -80,7 +80,7 @@ test('should redirect to given path', async () => {
     {
       path: '/home',
       exact: true,
-      component: asyncComponent({ loader: mockLoader }),
+      component: asyncComponent({ loader: mockLoader, LoadableComponent: DummyComponent }),
       redirectTo: '/path-to-redirect'
     }
   ];
@@ -111,7 +111,7 @@ test('should throw an error if can not load route component initial props', asyn
     {
       path: '/home',
       exact: true,
-      component: asyncComponent({ loader: mockLoader }),
+      component: asyncComponent({ loader: mockLoader, LoadableComponent: InitialPropsComponent }),
       redirectTo: '/path-to-redirect'
     }
   ];
@@ -146,7 +146,7 @@ test('should use given Document component', async () => {
     {
       path: '/test',
       exact: true,
-      component: asyncComponent({ loader: mockLoader })
+      component: asyncComponent({ loader: mockLoader, LoadableComponent: DummyComponent })
     }
   ];
   const options = {

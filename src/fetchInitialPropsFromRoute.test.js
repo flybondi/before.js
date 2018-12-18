@@ -16,12 +16,12 @@ test('should return an empty object if the pathname is invalid', async () => {
     {
       path: '/',
       exact: true,
-      component: asyncComponent({ loader: mockLoader })
+      component: asyncComponent({ loader: mockLoader, LoadableComponent: DummyComponent })
     }
   ];
 
   const props = await fetchInitialPropsFromRoute(mockRoutes, '/test-pathname');
-  expect(mockLoader).toHaveBeenCalled();
+  expect(mockLoader).not.toHaveBeenCalled();
   expect(props).toHaveProperty('route', {});
   expect(props).toHaveProperty('data', {});
 });
@@ -33,7 +33,7 @@ test('should return a Match value but without data', async () => {
     {
       path: '/',
       exact: true,
-      component: asyncComponent({ loader: mockLoader })
+      component: asyncComponent({ loader: mockLoader, LoadableComponent: DummyComponent })
     },
     {
       path: '/no-match-path'
@@ -60,7 +60,7 @@ test('should load an async component and fetch their initial props', async () =>
     {
       path: '/',
       exact: true,
-      component: asyncComponent({ loader: mockLoader })
+      component: asyncComponent({ loader: mockLoader, LoadableComponent: DummyComponent })
     },
     {
       path: '/no-match-path'
@@ -224,7 +224,6 @@ test('should fetch initial props from matched route with the parsed querystring 
 
 test('should return null if the component does not have a fetch initial props method', async () => {
   const DummyComponent = () => <span>Hi there!</span>;
-  // DummyComponent.getInitialProps = jest.fn().mockResolvedValue({ test: true });
   const mockRoutes = [
     {
       path: '/',
