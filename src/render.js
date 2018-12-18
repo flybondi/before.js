@@ -6,7 +6,7 @@
 //
 // @flow strict
 import type { Extractor, PageProps, Renderer, RenderOptions, Request, Route } from 'render';
-import { ChunkExtractor } from '@loadable/server';
+import { ChunkExtractor, ChunkExtractorManager } from '@loadable/server';
 import { DocumentComponent as DefaultDoc } from './Document.component';
 import { fetchInitialPropsFromRoute } from './fetchInitialPropsFromRoute';
 import { isError, isPromise } from './utils';
@@ -37,8 +37,15 @@ const isNotEmpty = complement(isEmpty);
  * @param {string} html initial HTML
  */
 const parseDocument = (Document, docProps, html) => {
-  const doc = ReactDOMServer.renderToStaticMarkup(<Document {...docProps} />);
-  return `<!doctype html>` + doc.replace('BEFORE.JS-DATA', html);
+  const { extractor } = docProps;
+  // @TODO(lf): check if extractor is defined before use.
+  const doc = ReactDOMServer.renderToStaticMarkup(
+    <ChunkExtractorManager extractor={extractor}>
+      <Document {...docProps} />
+    </ChunkExtractorManager>
+  );
+
+  return `<!doctype html>` + doc.replace('BEFORE.JS-DATA', `${html}`);
 };
 
 /**
@@ -96,7 +103,7 @@ const createRenderPage = (
  * @param {string} statsPath
  * @returns {object | null} instance of ChunkExtractor
  */
-const getExtractor = (statsPath: ?string, entrypoints: string): ?Extractor => {
+const getExtractor = (statsPath: ?string, entrypoints: Array<string>): ?Extractor => {
   let extractor = null;
   if (statsPath) {
     const statsFile = path.resolve(statsPath);
@@ -105,11 +112,6 @@ const getExtractor = (statsPath: ?string, entrypoints: string): ?Extractor => {
 
   return extractor;
 };
-
-const getExtractors = ({ node, web }: { node: ?string, web: ?string }) => [
-  getExtractor(node, 'main'),
-  getExtractor(web, 'client')
-];
 
 /**
  * Function that will try to retrieve the intial props for the route that is trying
@@ -140,15 +142,15 @@ export async function render({
   filterServerData,
   generateCriticalCSS,
   customRenderer,
-  loadableStatsPath = {},
+  loadableStatsPath,
   title,
   ...rest
 }: RenderOptions) {
   // @NOTE(lf): Not sure is the originalUrl is the right property to use. Maybe will be originalUrl + url;
   const { url, originalUrl } = req;
-  const webExtractor = getExtractor(loadableStatsPath.web, 'client');
+  const extractor = getExtractor(loadableStatsPath, ['client']);
 
-  const renderPage = createRenderPage(req, routes, customRenderer);
+  const renderPage = createRenderPage(req, routes, customRenderer, extractor);
   let response = {};
   try {
     response = await fetchInitialPropsFromRoute(routes, url, {
@@ -175,11 +177,6 @@ export async function render({
     }
   }
 
-  // if (nodeExtractor && webExtractor) {
-  //   const { default: App } = nodeExtractor.requireEntrypoint();
-  //   jsx = webExtractor.collectChunks(<App />);
-  // }
-
   const docProps = await Document.getInitialProps({
     req,
     res,
@@ -189,11 +186,11 @@ export async function render({
     filterServerData,
     generateCriticalCSS,
     title,
-    extractor: webExtractor,
+    extractor,
     ...rest,
     error: isError(data) && data,
     match: route
   });
   const { html } = docProps;
-  return parseDocument(webExtractor.collectChunks(Document), docProps, html);
+  return parseDocument(Document, docProps, html);
 }

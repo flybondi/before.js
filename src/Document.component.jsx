@@ -6,7 +6,8 @@ import Error from './Error.component';
 import serialize from 'serialize-javascript';
 
 const getHeaderTags = (extractor: Extractor) => [
-  ...extractor.getStyleTags(),
+  ...extractor.getScriptElements(),
+  ...extractor.getStyleElements(),
   ...extractor.getLinkElements()
 ];
 
@@ -46,8 +47,8 @@ export class DocumentComponent extends PureComponent<DocumentInitialProps> {
         <head>
           <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
           <meta charSet="utf-8" />
-          <title>{title}</title>
           <meta name="viewport" content="width=device-width, initial-scale=1" />
+          <title>{title}</title>
           {helmet.title.toComponent()}
           {helmet.meta.toComponent()}
           {helmet.link.toComponent()}
@@ -66,7 +67,6 @@ export class DocumentComponent extends PureComponent<DocumentInitialProps> {
               <Error message={error.message} stack={error.stack} />
             )
           ) : null}
-          {extractor && extractor.getScriptTags()}
         </body>
       </html>
     );
