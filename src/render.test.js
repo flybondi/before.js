@@ -36,14 +36,12 @@ test('should use the default document', async () => {
       status: jest.fn()
     },
     routes: mockRoutes,
-    assets: { client: {} },
-    title: 'Default Document'
+    assets: { client: {} }
   };
   const { render } = require('./render');
   const html = await render(options);
   expect(html).toBeDefined();
   expect(html).toContain('<!doctype html>');
-  expect(html).toContain('<title>Default Document</title>');
   expect(html).not.toContain('BEFORE.JS-DATA');
 });
 
@@ -66,8 +64,7 @@ test('should return a 404', async () => {
       status: jest.fn()
     },
     routes: mockRoutes,
-    assets: { client: {} },
-    title: 'Default Document'
+    assets: { client: {} }
   };
   const { render } = require('./render');
   await render(options);
@@ -94,8 +91,7 @@ test('should redirect to given path', async () => {
       status: jest.fn()
     },
     routes: mockRoutes,
-    assets: { client: {} },
-    title: 'Default Document'
+    assets: { client: {} }
   };
   const { render } = require('./render');
   await render(options);
@@ -126,12 +122,10 @@ test('should throw an error if can not load route component initial props', asyn
     },
     routes: mockRoutes,
     assets: { client: {} },
-    title: 'Error',
     errorComponent: ErrorComponent
   };
   const { render } = require('./render');
   const html = await render(options);
-  expect(html).toContain('<title>Error</title>');
   expect(InitialPropsComponent.getInitialProps).toHaveBeenCalled();
   expect(html).toContain('<span>mock error</span>');
 });
@@ -160,12 +154,10 @@ test('should use given Document component', async () => {
     },
     routes: mockRoutes,
     assets: { client: {} },
-    title: 'Custom document',
     document: CustomDocument
   };
   const { render } = require('./render');
   const html = await render(options);
   expect(CustomDocument.getInitialProps).toHaveBeenCalled();
-  expect(html).not.toContain('<title>Custom document</title>');
   expect(html).toEqual('<!doctype html><p>This is a custom document</p>');
 });

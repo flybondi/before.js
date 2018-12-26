@@ -1,7 +1,7 @@
 // @flow strict
 import type { DocumentInitialProps, Context, Extractor, DataType } from 'Document.component';
 import React, { PureComponent } from 'react';
-import { F, identity } from 'ramda';
+import { F, identity, path } from 'ramda';
 import Error from './Error.component';
 import serialize from 'serialize-javascript';
 
@@ -17,13 +17,12 @@ export class DocumentComponent extends PureComponent<DocumentInitialProps> {
     data,
     renderPage,
     generateCriticalCSS = F,
-    title,
     extractor,
     ...rest
   }: Context): Promise<DocumentInitialProps> {
     const page = await renderPage(data);
     const criticalCSS = generateCriticalCSS();
-    return { assets, criticalCSS, data, title, extractor, ...rest, ...page };
+    return { assets, criticalCSS, data, extractor, ...rest, ...page };
   }
 
   render() {
@@ -32,7 +31,6 @@ export class DocumentComponent extends PureComponent<DocumentInitialProps> {
       assets,
       criticalCSS,
       data,
-      title,
       error,
       errorComponent: ErrorComponent,
       filterServerData = identity,
@@ -41,21 +39,20 @@ export class DocumentComponent extends PureComponent<DocumentInitialProps> {
     // get attributes from React Helmet
     const htmlAttrs = helmet.htmlAttributes.toComponent();
     const bodyAttrs = helmet.bodyAttributes.toComponent();
-
+    const clientCss = path(['client', 'css'], assets);
     return (
       <html {...htmlAttrs}>
         <head>
           <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
           <meta charSet="utf-8" />
           <meta name="viewport" content="width=device-width, initial-scale=1" />
-          <title>{title}</title>
           {helmet.title.toComponent()}
           {helmet.meta.toComponent()}
           {helmet.link.toComponent()}
           {helmet.script.toComponent()}
           {extractor && getHeaderTags(extractor)}
           {criticalCSS !== false && criticalCSS}
-          {assets.client.css && <link rel="stylesheet" href={assets.client.css} />}
+          {clientCss && <link rel="stylesheet" href={clientCss} />}
         </head>
         <body {...bodyAttrs}>
           <Root />

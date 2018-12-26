@@ -37,11 +37,9 @@ test('should render the server-app-state', () => {
     data: {
       test: true
     },
-    title: 'This is a test',
     filterServerData: data => data
   };
   const wrapper = mount(<Document {...documentProps} />);
-  const title = wrapper.find('title');
   const script = wrapper.find('#server-app-state');
   const link = wrapper.find('link');
   const root = wrapper.find('#root');
@@ -49,7 +47,6 @@ test('should render the server-app-state', () => {
   expect(documentProps.helmet.title.toComponent).toHaveBeenCalled();
   expect(documentProps.helmet.meta.toComponent).toHaveBeenCalled();
   expect(documentProps.helmet.link.toComponent).toHaveBeenCalled();
-  expect(title.text()).toBe('This is a test');
   expect(script.text()).toBe('{"test":true}');
   expect(root.text()).toBe('BEFORE.JS-DATA');
   expect(link.prop('href')).toBe('css-path.css');
@@ -87,11 +84,9 @@ test('should filter the server-app-state with the given function', () => {
       test: true,
       shouldFilterMe: true
     },
-    title: 'This is a test',
     filterServerData: jest.fn().mockImplementation(({ shouldFilterMe, ...rest }) => rest)
   };
   const wrapper = mount(<Document {...documentProps} />);
-  const title = wrapper.find('title');
   const script = wrapper.find('#server-app-state');
   const link = wrapper.find('link');
   const root = wrapper.find('#root');
@@ -99,7 +94,6 @@ test('should filter the server-app-state with the given function', () => {
   expect(documentProps.helmet.title.toComponent).toHaveBeenCalled();
   expect(documentProps.helmet.meta.toComponent).toHaveBeenCalled();
   expect(documentProps.helmet.link.toComponent).toHaveBeenCalled();
-  expect(title.text()).toBe('This is a test');
   expect(script.text()).toBe('{"test":true}');
   expect(root.text()).toBe('BEFORE.JS-DATA');
   expect(link.prop('href')).toBe('css-path.css');
@@ -117,7 +111,6 @@ test('should call the function to generate the critical CSS', () => {
       test: true,
       shouldFilterMe: true
     },
-    title: 'This is a test',
     renderPage: jest.fn().mockResolvedValue({ html: 'test' }),
     generateCriticalCSS: jest.fn().mockReturnValue('critical styles')
   };
