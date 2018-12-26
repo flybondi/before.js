@@ -12,8 +12,8 @@ import { fetchInitialPropsFromRoute } from './fetchInitialPropsFromRoute';
 import { isError, isPromise } from './utils';
 import { complement, isEmpty } from 'ramda';
 import { StaticRouter } from 'react-router-dom';
+import { Helmet } from 'react-helmet';
 import Before from './Before.component';
-import Helmet from 'react-helmet';
 import path from 'path';
 import React from 'react';
 import ReactDOMServer from 'react-dom/server';
@@ -38,12 +38,14 @@ const isNotEmpty = complement(isEmpty);
  */
 const parseDocument = (Document, docProps, html) => {
   const { extractor } = docProps;
-  // @TODO(lf): check if extractor is defined before use.
-  const doc = ReactDOMServer.renderToStaticMarkup(
+  const rootNode = extractor ? (
     <ChunkExtractorManager extractor={extractor}>
       <Document {...docProps} />
     </ChunkExtractorManager>
+  ) : (
+    <Document {...docProps} />
   );
+  const doc = ReactDOMServer.renderToStaticMarkup(rootNode);
 
   return `<!doctype html>` + doc.replace('BEFORE.JS-DATA', `${html}`);
 };
@@ -93,7 +95,7 @@ const createRenderPage = (
     ? await asyncOrSyncRender
     : asyncOrSyncRender;
   const helmet = Helmet.renderStatic();
-  return { helmet, ...renderedContent };
+  return { ...renderedContent, helmet };
 };
 
 /**
@@ -148,8 +150,8 @@ export async function render({
 }: RenderOptions) {
   const { url, originalUrl } = req;
   const extractor = getExtractor(statsPath, ['client']);
-
   const renderPage = createRenderPage(req, routes, customRenderer);
+
   let response = {};
   try {
     response = await fetchInitialPropsFromRoute(routes, url, {
