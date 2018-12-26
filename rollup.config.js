@@ -17,6 +17,7 @@ export default {
     'react',
     'react-dom',
     'react-router-dom',
+    'react-helmet',
     'path',
     '@loadable/server',
     '@loadable/component'
