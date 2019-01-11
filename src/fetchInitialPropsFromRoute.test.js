@@ -122,6 +122,7 @@ test('should fetch initial props from matched route component', async () => {
     },
     req: {
       originalUrl: '',
+      path: '',
       query: {},
       url: ''
     }
@@ -309,6 +310,7 @@ test('should throw an error while fetching initial props from matched route comp
       },
       req: {
         originalUrl: '',
+        path: '',
         query: {},
         url: ''
       }
@@ -354,6 +356,7 @@ test('should throw an error while fetching initial props from matched async rout
       },
       req: {
         originalUrl: '',
+        path: '',
         query: {},
         url: ''
       }

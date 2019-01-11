@@ -54,7 +54,8 @@ const defaultContext = {
   req: {
     query: {},
     originalUrl: '',
-    url: ''
+    url: '',
+    path: ''
   }
 };
 
