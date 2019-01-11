@@ -28,7 +28,7 @@ test('should use the default document', async () => {
   ];
   const options = {
     req: {
-      url: '/',
+      path: '/',
       originalUrl: 'https://test.com'
     },
     res: {
@@ -56,7 +56,7 @@ test('should return a 404', async () => {
   ];
   const options = {
     req: {
-      url: '/',
+      path: '/',
       originalUrl: 'https://test.com'
     },
     res: {
@@ -83,7 +83,7 @@ test('should redirect to given path', async () => {
   ];
   const options = {
     req: {
-      url: '/home',
+      path: '/home',
       originalUrl: 'https://test.com/home'
     },
     res: {
@@ -113,7 +113,7 @@ test('should throw an error if can not load route component initial props', asyn
   ];
   const options = {
     req: {
-      url: '/home',
+      path: '/home',
       originalUrl: 'https://test.com/home'
     },
     res: {
@@ -145,7 +145,7 @@ test('should use given Document component', async () => {
   ];
   const options = {
     req: {
-      url: '/test',
+      path: '/test',
       originalUrl: 'https://test.com/test'
     },
     res: {
