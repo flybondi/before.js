@@ -76,7 +76,7 @@ const getQueryString = (location = {}, { query }) => {
  * @param {React$PureComponent} component to fetch the initial props
  * @param {Match|Route} match react-router match or route object
  * @param {object} context
- * @returns {object|null}
+ * @returns {Promise<object|null>}
  */
 export const getInitialPropsFromComponent = async (
   component: AsyncFixMeComponentType,
