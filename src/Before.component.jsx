@@ -128,14 +128,18 @@ export class Before extends Component<BeforeComponentWithRouterProps, BeforeStat
 
   async componentDidUpdate(prevProps: BeforeComponentWithRouterProps) {
     if (isClientSide() && prevProps.location !== this.props.location) {
-      const { location, routes } = this.props;
+      const { history, location, routes, ...rest } = this.props;
       const { pathname } = location;
       // NOTE(lf): Not necessary to run an initial fetch on all routes, just the one that we want to render.
       try {
         const currentRoute = getCurrentRouteByPath(pathname, routes);
         if (currentRoute) {
           // $FlowFixMe Component
-          const data = await getInitialPropsFromComponent(currentRoute.component, currentRoute);
+          const data = await getInitialPropsFromComponent(currentRoute.component, currentRoute, {
+            location,
+            history,
+            ...rest
+          });
           this.setState(() => ({
             previousLocation: location,
             data
