@@ -63,6 +63,7 @@ declare module 'fetchInitialPropsFromRoutes' {
     url: string,
     query: QueryType,
     originalUrl: string,
+    path: string,
     [key: string]: any
   };
 

@@ -78,6 +78,7 @@ declare module 'render' {
     url: string,
     query: QueryType,
     originalUrl: string,
+    path: string,
     [key: string]: any
   };
 

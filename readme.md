@@ -81,6 +81,7 @@ type Context = {
     url: string,
     query: { [key: string]: string },
     originalUrl: string,
+    path: string,
     [key: string]: any
   },
   res?: {
