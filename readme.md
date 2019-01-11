@@ -68,8 +68,9 @@ About.getInitialProps = async ({ req, res, match, history, location, ...rest }) 
 
 ### `static async getInitialProps(context): InitialProps`
 
-Within `getInitialProps`, you have access to all you need to fetch data on both
-the client and the server:
+Notice that to load data when the page loads, we use `getInitialProps` which is an async static method. It can asynchronously fetch anything that resolves to a JavaScript plain Object, which populates props.
+Data returned from `getInitialProps` is serialized when server rendering, similar to a JSON.stringify. Make sure the returned object from `getInitialProps` is a plain Object and not using Date, Map or Set.
+For the initial page load, `getInitialProps` will execute on the server only. `getInitialProps` will only be executed on the client when navigating to a different route via the **Link** component or using the routing APIs.
 
 ```js
 type DataType = {
@@ -173,38 +174,6 @@ class Detail extends React.Component {
 }
 
 export default Detail;
-```
-
-### Prefetching inital data
-
-In order to prefecth the initial data for a given route just set the `prefetch` property to `true` and when the component is mounted
-in the client, it will call the `static async getInitialProps` from each route and store them in the `window.localStorage`.
-
-```js
-// ./src/routes.js
-import Home from './Home';
-import About from './About';
-import Detail from './Detail';
-
-const routes = [
-  {
-    path: '/',
-    component: Home,
-    prefetch: false
-  },
-  {
-    path: '/about',
-    component: About,
-    prefetch: true
-  },
-  {
-    path: '/detail/:id',
-    component: Detail,
-    prefetch: true
-  }
-];
-
-export default routes;
 ```
 
 ### Client Only Data and Routing
