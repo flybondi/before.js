@@ -148,13 +148,13 @@ export async function render({
   title,
   ...rest
 }: RenderOptions) {
-  const { url, originalUrl } = req;
+  const { path, originalUrl } = req;
   const extractor = getExtractor(statsPath, ['client']);
   const renderPage = createRenderPage(req, routes, customRenderer);
 
   let response = {};
   try {
-    response = await fetchInitialPropsFromRoute(routes, url, {
+    response = await fetchInitialPropsFromRoute(routes, path, {
       req,
       res,
       ...rest
