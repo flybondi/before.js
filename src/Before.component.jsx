@@ -36,6 +36,7 @@ const createRenderRoute = (initialData: ?DataType, Component: FixMeType) => (
   const routeProps = {
     ...initialData,
     history: props.history,
+    location: props.location,
     match: {
       ...props.match,
       querystring: parse(props.location.search)
