@@ -24,7 +24,6 @@
     "lint": "eslint src/",
     "prepublishOnly": "yarn build",
     "prettier": "prettier --write src/",
-    "start": "",
     "test.coverage": "yarn test --coverage --coverageDirectory .coverage",
     "test.watch": "jest --watchAll",
     "test": "jest"
