@@ -1,7 +1,8 @@
-// @flow strict;
+// flow-typed signature: afa3502910d5b2aef93707cc683f52b8
+// flow-typed version: 492c298a82/react-helmet_v5.x.x/flow_>=v0.53.x
 
 declare module 'react-helmet' {
-  declare export type HelmetProps = {
+  declare type Props = {
     base?: Object,
     bodyAttributes?: Object,
     children?: React$Node,
@@ -12,13 +13,17 @@ declare module 'react-helmet' {
     link?: Array<Object>,
     meta?: Array<Object>,
     noscript?: Array<Object>,
-    onChangeClientState?: (newState?: Object, addedTags?: Object, removeTags?: Object) => any,
+    onChangeClientState?: (
+      newState?: Object,
+      addedTags?: Object,
+      removeTags?: Object
+    ) => any,
     script?: Array<Object>,
     style?: Array<Object>,
     title?: string,
     titleAttributes?: Object,
-    titleTemplate?: string
-  };
+    titleTemplate?: string,
+  }
 
   declare interface TagMethods {
     toString(): string;
@@ -27,12 +32,12 @@ declare module 'react-helmet' {
 
   declare interface AttributeTagMethods {
     toString(): string;
-    toComponent(): { [string]: * };
+    toComponent(): {[string]: *};
   }
 
-  declare export interface StateOnServer {
+  declare interface StateOnServer {
     base: TagMethods;
-    bodyAttributes: AttributeTagMethods;
+    bodyAttributes: AttributeTagMethods,
     htmlAttributes: AttributeTagMethods;
     link: TagMethods;
     meta: TagMethods;
@@ -42,12 +47,13 @@ declare module 'react-helmet' {
     title: TagMethods;
   }
 
-  declare class Helmet extends React$Component<HelmetProps> {
+  declare class Helmet extends React$Component<Props> {
     static rewind(): StateOnServer;
     static renderStatic(): StateOnServer;
     static canUseDom(canUseDOM: boolean): void;
   }
 
-  declare export default typeof Helmet;
-  declare export var Helmet: typeof Helmet;
+  declare export default typeof Helmet
+  declare export var Helmet: typeof Helmet
 }
+

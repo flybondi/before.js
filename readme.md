@@ -1,4 +1,9 @@
-# Before.js
+<p align="center">
+  <img src="https://www.flybondi.com/assets/images/logo.svg" title="Flybondi" width="300" style="margin-bottom: 1rem" />
+</p>
+<h1 align="center">Before.js</h1>
+
+![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg) ![js-semistandard-style](https://img.shields.io/badge/code%20style-semistandard-brightgreen.svg?style=flat) ![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat) ![CircleCI](https://circleci.com/gh/flybondi/before.js.svg?style=shield&circle-token=4ba6f16c2f14514e0b638a89142b5056cf1aa9a9)
 
 **Table of Contents**
 
@@ -14,7 +19,7 @@
 
 ## Getting Started with Before.js
 
-Before.js enables data fetching with any React SSR app that uses React Router 4.
+**Before.js** enables data fetching with any React SSR app that uses React Router 4.
 
 ## Data Fetching
 
@@ -58,26 +63,62 @@ About.getInitialProps = async ({ req, res, match, history, location, ...rest }) 
 }
 ```
 
-### `static async getInitialProps(context)`
+### `static async getInitialProps(context): InitialProps`
 
-Within `getInitialProps`, you have access to all you need to fetch data on both
-the client and the server:
+Notice that to load data when the page loads, we use `getInitialProps` which is an async static method. It can asynchronously fetch anything that resolves to a JavaScript plain Object, which populates props.
+Data returned from `getInitialProps` is serialized when server rendering, similar to a JSON.stringify. Make sure the returned object from `getInitialProps` is a plain Object and not using Date, Map or Set.
+For the initial page load, `getInitialProps` will execute on the server only. `getInitialProps` will only be executed on the client when navigating to a different route via the **Link** component or using the routing APIs.
 
-- `req?: Request`: (server-only) A server request object
-- `res?: Request`: (server-only) A server response object
-- `match`: React Router 4's `match` object.
-- `history`: React Router 4's `history` object.
-- `location`: (client-only) React Router 4's `location` object.
+```js
+type DataType = {
+  [key: any]: any
+};
 
-### Injected Page Props
-
-- Whatever you have returned in `getInitialProps`
-- `refetch: (nextCtx?: any) => void` - Imperatively call `getInitialProps` again
+type Context = {
+  req: {
+    url: string,
+    query: { [key: string]: string },
+    originalUrl: string,
+    path: string,
+    [key: string]: any
+  },
+  res?: {
+    status(code: number): void,
+    redirect(code: number, redirectTo: string): void,
+    [key: string]: any
+  },
+  assets?: {
+    client: {
+      css: string,
+      js: string
+    }
+  },
+  data?: ?DataType,
+  filterServerData?: (data: ?DataType) => DataType,
+  renderPage?: (data: ?DataType) => Promise<Page>,
+  generateCriticalCSS?: () => string | boolean,
+  title?: string,
+  extractor?: ?Extractor,
+  location?: {
+    hash: string,
+    key?: string,
+    pathname: string,
+    search: string,
+    state?: any
+  }
+};
+```
 
 ## Routing
 
 As you have probably figured out, React Router 4 powers all of Before.js's
 routing. You can use any and all parts of RR4.
+
+### React Router _withRouter_ HOC
+
+Before will inject `location` and `match` properties in each route props which are the same properties from React Router. Also, the `match` property will include a parsed object with the actual query string values from the `location.search`.
+Take in mind that if you use the _withRouter_ HOC from React Router It will still work as expected but it will override the values from **Before.js**.
+
 
 ### Parameterized Routing
 
@@ -138,38 +179,6 @@ class Detail extends React.Component {
 export default Detail;
 ```
 
-### Prefetching inital data
-
-In order to prefecth the initial data for a given route just set the `prefetch` property to `true` and when the component is mounted
-in the client, it will call the `static async getInitialProps` from each route and store them in the `window.localStorage`.
-
-```js
-// ./src/routes.js
-import Home from './Home';
-import About from './About';
-import Detail from './Detail';
-
-const routes = [
-  {
-    path: '/',
-    component: Home,
-    prefetch: false
-  },
-  {
-    path: '/about',
-    component: About,
-    prefetch: true
-  },
-  {
-    path: '/detail/:id',
-    component: Detail,
-    prefetch: true
-  }
-];
-
-export default routes;
-```
-
 ### Client Only Data and Routing
 
 In some parts of your application, you may not need server data fetching at all
@@ -179,13 +188,15 @@ the same exact way.
 
 ## Code Splitting
 
-Before.js lets you easily define lazy-loaded or code-split routes in your `routes.js` file. To do this, you'll need to modify the relevant route's `component` definition like so:
+**Before.js** lets you easily define lazy-loaded or code-split routes in your `routes.js` file. To do this, you'll need to modify the relevant route's `component` definition like so:
 
 ```js
 // ./src/_routes.js
 import React from 'react';
 import Home from './Home';
-import { asyncComponent } from '@flybondi/Before.js.js';
+import { asyncComponent } from '@flybondi/Before.js';
+import loadable from '@loadable/component';
+import Loading from './Loading';
 
 export default [
   // normal route
@@ -199,18 +210,79 @@ export default [
     path: '/about',
     exact: true,
     component: asyncComponent({
-      loader: () => import('./About'), // required
-      Placeholder: () => <div>...LOADING...</div> // this is optional, just returns null by default
+      loader: () => import(* webpackChunkName: "about" */ './About'), // required in order to get initial props from this route.
+      LoadableComponent: loadable(
+	      () => import(* webpackChunkName: "about" */ './About'),
+	      { fallback: () => <Loading /> }
+	  )
     })
   }
 ];
+```
+
+**Before.js** use [@loadable](https://www.smooth-code.com/open-source/loadable-components/docs/getting-started/) components to support server-side chunks/code-split. In order to use this feature all you have to do is the following setup:
+
+1. Install `@loadable/babel-plugin` and add it to the _.babelrc_
+
+```json
+{
+  "plugins": ["@loadable/babel-plugin"]
+}
+```
+
+2. Install `@loadable/webpack-plugin` and include it in the plugins definition of the _webpack.config.js_
+
+```js
+const LoadablePlugin = require('@loadable/webpack-plugin');
+
+module.exports = {
+  // ...
+  plugins: [new LoadablePlugin({ writeToDisk: true })]
+};
+```
+
+3. Setup `ChunkExtractor` server-side, pass the _loadable-stats.json_ (file generated by _webpack lodable plugin_) path to the **Before.js** render method.
+
+```js
+import { render } from '@flybondi/before.js';
+// ...
+
+const statsPath = '../dist/loadable-stats.json';
+
+await render({
+  req: req,
+  res: {},
+  routes: propOr([], 'routes', config),
+  assets,
+  statsPath
+});
+```
+
+4. Use the `ensureClientReady` method in the client-side.
+
+```jsx
+import React from 'react';
+import routes from './routes';
+import { hydrate } from 'react-dom';
+import { ensureReady, ensureClientReady, Before } from '@flybondi/before.js';
+
+ensureReady(routes).then(data => {
+  return ensureClientReady(() => {
+    hydrate(
+      <BrowserRouter>
+        <Before data={data} routes={routes} />
+      </BrowserRouter>,
+      document.getElementById('root')
+    );
+  });
+});
 ```
 
 ## Custom `<Document>`
 
 Before.js works similarly to Next.js with respect to overriding HTML document structure. This comes in handy if you are using a CSS-in-JS library or just want to collect data out of react context before or Before render. To do this, create a file in `./src/Document.js` like so:
 
-```js
+```jsx
 // ./src/Document.js
 import React, { PureComponent } from 'react';
 
@@ -254,7 +326,7 @@ export default Document;
 
 If you were using something like `styled-components`, and you need to wrap you entire app with some sort of additional provider or function, you can do this with `renderPage()`.
 
-```js
+```jsx
 // ./src/Document.js
 import React, { PureComponent } from 'react';
 import { ServerStyleSheet } from 'styled-components';
@@ -320,7 +392,8 @@ server
         res,
         document: MyDocument,
         routes,
-        assets
+        assets,
+        statsPath
       });
       res.send(html);
     } catch (error) {
@@ -341,7 +414,7 @@ Thus, setting `customRenderer = (node) => ({ html: ReactDOMServer.renderToString
 
 `otherProps` will be passed as props to the rendered Document
 
-Example :
+Example:
 
 ```js
 // ./src/server.js
@@ -379,7 +452,8 @@ server
         routes,
         assets,
         customRenderer,
-        document: Document
+        document: Document,
+        statsPath
       });
       res.send(html);
     } catch (error) {
@@ -389,3 +463,4 @@ server
 
 export default server;
 ```
+

@@ -1,56 +1,28 @@
-// @flow strict;
-
-import type { StateOnServer } from 'react-helmet';
+// @flow strict
+import type { DocumentInitialProps, Context, Extractor, DataType } from 'Document.component';
 import React, { PureComponent } from 'react';
-import { F, identity } from 'ramda';
+import { F, identity, path } from 'ramda';
 import Error from './Error.component';
 import serialize from 'serialize-javascript';
 
-export type DocumentProps = {
-  helmet: StateOnServer,
-  assets: {
-    client: {
-      css: ?string,
-      js: ?string
-    }
-  },
-  data: any,
-  title: ?string,
-  error?: Error,
-  errorComponent?: React$ElementType | React$ComponentType<any>,
-  filterServerData: (data: { [key: string]: any }) => { [key: string]: any },
-  criticalCSS: React$Node | false
-};
+const getHeaderTags = (extractor: Extractor) => [
+  ...extractor.getScriptElements(),
+  ...extractor.getStyleElements(),
+  ...extractor.getLinkElements()
+];
 
-export type DocumentInitialProps = {
-  [key: string]: any,
-  assets: {
-    client: {
-      css: ?string,
-      js: ?string
-    }
-  },
-  data: any,
-  title?: string,
-  error?: Error,
-  errorComponent?: React$ElementType | React$ComponentType<any>,
-  filterServerData: (data: { [key: string]: any }) => { [key: string]: any },
-  renderPage: (data: { [key: string]: any }) => Promise<any>,
-  generateCriticalCSS: () => React$Node | false
-};
-
-export class Document extends PureComponent<DocumentProps> {
+export class DocumentComponent extends PureComponent<DocumentInitialProps> {
   static async getInitialProps({
     assets,
     data,
     renderPage,
     generateCriticalCSS = F,
-    title,
+    extractor,
     ...rest
-  }: DocumentInitialProps): Promise<DocumentProps> {
+  }: Context): Promise<DocumentInitialProps> {
     const page = await renderPage(data);
     const criticalCSS = generateCriticalCSS();
-    return { assets, criticalCSS, data, title, ...rest, ...page };
+    return { assets, criticalCSS, data, extractor, ...rest, ...page };
   }
 
   render() {
@@ -59,35 +31,39 @@ export class Document extends PureComponent<DocumentProps> {
       assets,
       criticalCSS,
       data,
-      title,
       error,
       errorComponent: ErrorComponent,
-      filterServerData = identity
+      filterServerData = identity,
+      extractor
     } = this.props;
     // get attributes from React Helmet
     const htmlAttrs = helmet.htmlAttributes.toComponent();
     const bodyAttrs = helmet.bodyAttributes.toComponent();
-
+    const clientCss = path(['client', 'css'], assets);
     return (
       <html {...htmlAttrs}>
         <head>
           <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
           <meta charSet="utf-8" />
-          <title>{title}</title>
           <meta name="viewport" content="width=device-width, initial-scale=1" />
           {helmet.title.toComponent()}
           {helmet.meta.toComponent()}
           {helmet.link.toComponent()}
+          {helmet.script.toComponent()}
+          {extractor && getHeaderTags(extractor)}
           {criticalCSS !== false && criticalCSS}
-          {assets.client.css && <link rel="stylesheet" href={assets.client.css} />}
+          {clientCss && <link rel="stylesheet" href={clientCss} />}
         </head>
         <body {...bodyAttrs}>
           <Root />
           <Data data={filterServerData(data)} />
-          {error
-            ? ErrorComponent ? <ErrorComponent error={error} /> : <Error message={error.message} stack={error.stack} />
-            : null}
-          <script type="text/javascript" src={assets.client.js} defer crossOrigin="anonymous" />
+          {error ? (
+            ErrorComponent ? (
+              <ErrorComponent error={error} />
+            ) : (
+              <Error message={error.message} stack={error.stack} />
+            )
+          ) : null}
         </body>
       </html>
     );
@@ -96,7 +72,7 @@ export class Document extends PureComponent<DocumentProps> {
 
 export const Root = () => <div id="root">BEFORE.JS-DATA</div>;
 
-export const Data = ({ data }: any) => (
+export const Data = ({ data }: { data: DataType }) => (
   <script
     id="server-app-state"
     type="application/json"
