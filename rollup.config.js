@@ -4,12 +4,24 @@ import babel from 'rollup-plugin-babel';
 import commonjs from 'rollup-plugin-commonjs';
 import flow from 'rollup-plugin-flow';
 import bundleSize from 'rollup-plugin-bundle-size';
-import ramda from 'rollup-plugin-ramda';
+import ramda from '@flybondi/rollup-plugin-ramda';
 import pkg from './package.json';
+import { plugin as analyze } from 'rollup-plugin-analyzer';
+import visualizer from 'rollup-plugin-visualizer';
+import filesize from 'rollup-plugin-filesize';
+import progress from 'rollup-plugin-progress';
 
 export default {
   input: 'index.js',
-  external: ['react', 'react-dom', 'react-router-dom', 'url'],
+  external: [
+    'react',
+    'react-dom',
+    'react-router-dom',
+    'react-helmet',
+    'path',
+    '@loadable/server',
+    '@loadable/component'
+  ],
   output: [
     {
       globals: {
@@ -34,7 +46,14 @@ export default {
   ],
   plugins: [
     clean(),
-    flow(),
+    filesize(),
+    analyze(),
+    visualizer({
+      filename: './bundle-analysis.html',
+      title: pkg.name
+    }),
+    progress(),
+    flow({ pretty: true }),
     resolve({
       extensions: ['.js', '.jsx', '.mjs'],
       jsnext: true,

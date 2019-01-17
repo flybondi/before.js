@@ -10,12 +10,12 @@
   ],
   "env": {
     "node": true,
-    "jest": true
+    "jest": true,
+    "browser": true
   },
   "settings": {
     "react": {
-      "version": ">= 16",
-      "flowVersion": ">= 0.79"
+      "version": ">= 16"
     }
   },
   "rules": {

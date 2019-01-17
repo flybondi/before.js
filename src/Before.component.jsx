@@ -1,128 +1,119 @@
-// @flow strict;
-
+// @flow strict
+import type {
+  AsyncRoute,
+  BeforeState,
+  BeforeComponentWithRouterProps,
+  DataType,
+  FixMeType
+} from 'Before.component';
 import React, { Component } from 'react';
-import {
-  Switch,
-  Route,
-  withRouter,
-  type Location,
-  type Match,
-  type RouterHistory,
-  type RouteProps,
-  type ContextRouter
-} from 'react-router-dom';
-import {
-  fetchInitialPropsFromRoute,
-  getInitialPropsFromComponent
-} from './fetchInitialPropsFromRoute';
+import { Switch, Route, withRouter, type ContextRouter } from 'react-router-dom';
+import { getInitialPropsFromComponent } from './fetchInitialPropsFromRoute';
 import { isClientSide } from './utils';
+import { converge, find, nthArg, pipe, propEq } from 'ramda';
+import { parse } from 'query-string';
+const { NODE_ENV } = process.env;
 
-type State = {
-  previousLocation: ?Location,
-  data: any
-};
-
-declare class BeforeComponent<TProps, TState> extends React$Component<TProps, TState> {
-  default?: BeforeComponent<TProps, TState>;
-  getInitialProps: (data: any) => Promise<any | Error>;
-  load: () => Promise<BeforeComponent<TProps, TState>>;
-}
-
-export type BeforeRoute<TProps, TState> = {
-  ...RouteProps,
-  component: BeforeComponent<TProps, TState>,
-  redirectTo?: string,
-  prefetch?: boolean,
-  isExact: boolean,
-  params: { [key: string]: ?string },
-  url: string
-};
-
-type Props = {
-  [key: string]: any,
-  data: any,
-  location: Location,
-  match: Match,
-  routes: Array<BeforeRoute<any, any>>,
-  history: RouterHistory
-};
-
+/**
+ * Log the error to console only in development environment and throw up given error;
+ * @param {Error} error
+ * @throws Error
+ */
 const throwError = (error: Error) => {
-  console.error('There was an error', error);
+  NODE_ENV === 'development' && console.error('There was an error', error);
   throw error;
 };
 
-const createRenderRoute = (initialData: any, Component: any) => (props: ContextRouter) => {
+/**
+ * Inject context router props into given component.
+ * @param {object} initialData
+ * @param {React$Component} Component
+ * @returns {React$Element<any>}
+ */
+const createRenderRoute = (initialData: ?DataType, Component: FixMeType) => (
+  props: ContextRouter
+) => {
   const routeProps = {
     ...initialData,
     history: props.history,
-    match: props.match
+    location: props.location,
+    match: {
+      ...props.match,
+      querystring: parse(props.location.search)
+    }
   };
-
   return <Component {...routeProps} />;
 };
 
-const getDataFromStore = (key: string) => {
-  const data = localStorage.getItem(key);
-  return data ? JSON.parse(data) : null;
-};
+/**
+ * Retrieve the current route by a given path.
+ * @func
+ * @param {string} pathname
+ * @param {array} routes an array of route to filter
+ * @returs {object|undefined} a valid route
+ **/
+const getCurrentRouteByPath: (
+  pathname: string,
+  routes: Array<AsyncRoute>
+) => ?AsyncRoute = converge(find, [
+  pipe(
+    nthArg(0),
+    propEq('path')
+  ),
+  nthArg(1)
+]);
 
-const setDataIntoStore = (route: BeforeRoute<any, any>) => (data: any) => {
-  if (route && data) {
-    const { path } = route;
-    const { hostname } = window.location;
-    localStorage.setItem(`${hostname}${path || ''}`, JSON.stringify(data));
-  }
-};
-
-class Before extends Component<Props, State> {
+/**
+ * React Component class that wraps all async router components into a Route react-router
+ * inside a Switch.
+ * @class
+ */
+export class Before extends Component<BeforeComponentWithRouterProps, BeforeState> {
   state = {
     previousLocation: this.props.location,
     data: this.props.data
   };
-  prefetchInitialPropsFromAllRoutes = async () => {
-    const { location, routes } = this.props;
-    const routesForpreFetch = routes.filter(r => r.prefetch);
-    const promises = routesForpreFetch.map(route =>
-      getInitialPropsFromComponent(route.component, route).then(setDataIntoStore(route))
-    );
 
-    return Promise.all(promises).catch(throwError);
+  fetchInitialPropsFromCurrentRoute = async (props: BeforeComponentWithRouterProps) => {
+    const { history, location, routes, ...rest } = props;
+    const { pathname } = location;
+    // NOTE(lf): Not necessary to run an initial fetch on all routes, just the one that we want to render.
+    try {
+      const currentRoute = getCurrentRouteByPath(pathname, routes);
+      if (currentRoute) {
+        // $FlowFixMe Component
+        const data = await getInitialPropsFromComponent(currentRoute.component, currentRoute, {
+          location,
+          history,
+          ...rest
+        });
+        return {
+          previousLocation: location,
+          data
+        };
+      }
+    } catch (error) {
+      throwError(error);
+      return {
+        previousLocation: null,
+        data: null
+      };
+    }
   };
 
-  constructor(props) {
-    super(props);
-    isClientSide() && this.prefetchInitialPropsFromAllRoutes();
-  }
-
-  componentDidUpdate(prevProps: Props) {
+  async componentDidUpdate(prevProps: BeforeComponentWithRouterProps) {
     if (isClientSide() && prevProps.location !== this.props.location) {
-      const { history, location, routes, ...rest } = this.props;
-      const notPrefetchedRoutes = routes.filter(r => !r.prefetch);
-      // @ToDo This could be update to use the `getInitialPropsFromComponent` method instead.
-      fetchInitialPropsFromRoute(notPrefetchedRoutes, location.pathname, {
-        location,
-        history,
-        ...rest
-      })
-        .then(({ data }) => {
-          this.setState(() => ({
-            previousLocation: location,
-            data
-          }));
-        })
-        .catch(throwError);
+      const state = await this.fetchInitialPropsFromCurrentRoute(this.props);
+      state && this.setState(() => state);
     }
   }
 
-  shouldComponentUpdate(nextProps: Props, nextState: State) {
+  shouldComponentUpdate(nextProps: BeforeComponentWithRouterProps, nextState: BeforeState) {
     return nextState.previousLocation !== null;
   }
 
   getData(path: string) {
-    return isClientSide()
-      ? getDataFromStore(`${window.location.hostname}${path}`) || this.state.data
-      : this.props.data;
+    return isClientSide() ? this.state.data : this.props.data;
   }
 
   render() {
