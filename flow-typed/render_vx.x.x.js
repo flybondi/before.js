@@ -1,7 +1,7 @@
 declare module 'render' {
   import type { AsyncComponentType } from 'fetchInitialPropsFromRoutes';
   import type { DocumentComponent } from 'Document.component';
-  import type { Extractor } from '@loadable/server';
+  import type { Extractor, ChunkExtractor, ChunkExtractorManager } from '@loadable/server';
 
   declare type Assets = {
     client: {
@@ -114,7 +114,11 @@ declare module 'render' {
     generateCriticalCSS(): string | boolean,
     customRenderer: Renderer,
     title: string,
-    statsPath: ?string,
+    loadableConfig?: {
+      statsPath: string,
+      ChunkExtractor: ChunkExtractor,
+      ChunkExtractorManager: ChunkExtractorManager
+    },
     [key: string]: any
   };
 

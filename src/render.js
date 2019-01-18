@@ -6,7 +6,6 @@
 //
 // @flow strict
 import type { Extractor, PageProps, Renderer, RenderOptions, Request, Route } from 'render';
-import { ChunkExtractor, ChunkExtractorManager } from '@loadable/server';
 import { DocumentComponent as DefaultDoc } from './Document.component';
 import { fetchInitialPropsFromRoute } from './fetchInitialPropsFromRoute';
 import { isError, isPromise } from './utils';
@@ -35,8 +34,9 @@ const isNotEmpty = complement(isEmpty);
  * @param {React$PureComponent} Document a react PureComponent
  * @param {object} docProps Document props object
  * @param {string} html initial HTML
+ * @param {ChunkExtractorManager} ChunkExtractorManager The ChunkExtractorManager constructor.
  */
-const parseDocument = (Document, docProps, html) => {
+const parseDocument = (Document, docProps, html, ChunkExtractorManager) => {
   const { extractor } = docProps;
   const rootNode = extractor ? (
     <ChunkExtractorManager extractor={extractor}>
@@ -86,7 +86,11 @@ const createRenderPage = (
 ) => async (data, createPageComponent = defaultCreatePageComponent) => {
   const asyncOrSyncRender = renderer(
     <StaticRouter location={req.url} context={context}>
-      {createPageComponent(Before)({ routes, data, req })}
+      {createPageComponent(Before)({
+        routes,
+        data,
+        req
+      })}
     </StaticRouter>
   );
 
@@ -101,15 +105,24 @@ const createRenderPage = (
 /**
  * Creates a new instance of ChunkExtractor if given path is defined.
  *
- * @func
+ * @function
+ * @param {ChunkExtractor | null} ChunkExtractor The ChunkExtractor constructor.
  * @param {string} statsPath
+ * @param {Array<string>} entrypoints
  * @returns {object | null} instance of ChunkExtractor
  */
-const getExtractor = (statsPath: ?string, entrypoints: Array<string>): ?Extractor => {
+const getExtractor = (
+  ChunkExtractor: any,
+  statsPath: ?string,
+  entrypoints: Array<string>
+): ?Extractor => {
   let extractor = null;
   if (statsPath) {
     const statsFile = path.resolve(statsPath);
-    extractor = new ChunkExtractor({ statsFile, entrypoints });
+    extractor = new ChunkExtractor({
+      statsFile,
+      entrypoints
+    });
   }
 
   return extractor;
@@ -129,8 +142,12 @@ const getExtractor = (statsPath: ?string, entrypoints: Array<string>): ?Extracto
  *   filterServerData,
  *   generateCriticalCSS,
  *   customRenderer,
- *   statsPath,
  *   title,
+ *   loadableConfig = {
+ *      statsPath: null,
+ *      ChunkExtractor: null,
+ *      ChunkExtractorManager: null
+ *   },
  *   ...rest
  * } RenderOptions an object with all options used to render the initial HTML.
  * @returns {Promise}
@@ -144,12 +161,17 @@ export async function render({
   filterServerData,
   generateCriticalCSS,
   customRenderer,
-  statsPath,
   title,
+  loadableConfig = {
+    statsPath: null,
+    ChunkExtractor: null,
+    ChunkExtractorManager: null
+  },
   ...rest
 }: RenderOptions) {
   const { path, originalUrl } = req;
-  const extractor = getExtractor(statsPath, ['client']);
+  const { ChunkExtractor, ChunkExtractorManager, statsPath } = loadableConfig;
+  const extractor = getExtractor(ChunkExtractor, statsPath, ['client']);
   const renderPage = createRenderPage(req, routes, customRenderer);
 
   let response = {};
@@ -193,5 +215,5 @@ export async function render({
     match: route
   });
   const { html } = docProps;
-  return parseDocument(Document, docProps, html);
+  return parseDocument(Document, docProps, html, ChunkExtractorManager);
 }
