@@ -132,7 +132,6 @@ declare module 'Before.component' {
   |};
 
   declare type BeforeState = {
-    previousLocation: ?LocationType,
     data: ?DataType
   };
 

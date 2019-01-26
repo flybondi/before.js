@@ -70,7 +70,6 @@ const getCurrentRouteByPath: (
  */
 export class Before extends Component<BeforeComponentWithRouterProps, BeforeState> {
   state = {
-    previousLocation: this.props.location,
     data: this.props.data
   };
 
@@ -88,14 +87,12 @@ export class Before extends Component<BeforeComponentWithRouterProps, BeforeStat
           ...rest
         });
         return {
-          previousLocation: location,
           data
         };
       }
     } catch (error) {
       throwError(error);
       return {
-        previousLocation: null,
         data: null
       };
     }
@@ -109,20 +106,19 @@ export class Before extends Component<BeforeComponentWithRouterProps, BeforeStat
   }
 
   shouldComponentUpdate(nextProps: BeforeComponentWithRouterProps, nextState: BeforeState) {
-    return nextState.previousLocation !== null;
+    // NOTE(lf): Allow render only when the routes change.
+    return this.props.location !== nextProps.location;
   }
 
-  getData(path: string) {
+  getData() {
     return isClientSide() ? this.state.data : this.props.data;
   }
 
   render() {
-    const { previousLocation } = this.state;
-    const { location, routes } = this.props;
-    const loc = previousLocation || location;
-    const initialData = this.getData(loc.pathname);
+    const { routes, location } = this.props;
+    const initialData = this.getData();
     return (
-      <Switch location={loc}>
+      <Switch location={location}>
         {routes.map((route, index) => (
           <Route
             key={`route--${index}`}
