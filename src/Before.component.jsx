@@ -4,15 +4,29 @@ import type {
   BeforeState,
   BeforeComponentWithRouterProps,
   DataType,
-  FixMeType
+  FixMeType,
+  SwitchRoutesProps
 } from 'Before.component';
-import React, { Component } from 'react';
+import React, { Component, memo } from 'react';
 import { Switch, Route, withRouter, type ContextRouter } from 'react-router-dom';
 import { getInitialPropsFromComponent } from './fetchInitialPropsFromRoute';
 import { isClientSide } from './utils';
 import { converge, find, nthArg, pipe, propEq } from 'ramda';
 import { parse } from 'query-string';
 const { NODE_ENV } = process.env;
+
+const SwitchRoutes = memo(({ location, routes, data }: SwitchRoutesProps) => (
+  <Switch location={location}>
+    {routes.map((route, index) => (
+      <Route
+        key={`route--${index}`}
+        path={route.path}
+        render={createRenderRoute(data, route.component)}
+        exact={route.exact}
+      />
+    ))}
+  </Switch>
+));
 
 /**
  * Log the error to console only in development environment and throw up given error;
@@ -117,18 +131,7 @@ export class Before extends Component<BeforeComponentWithRouterProps, BeforeStat
   render() {
     const { routes, location } = this.props;
     const initialData = this.getData();
-    return (
-      <Switch location={location}>
-        {routes.map((route, index) => (
-          <Route
-            key={`route--${index}`}
-            path={route.path}
-            render={createRenderRoute(initialData, route.component)}
-            exact={route.exact}
-          />
-        ))}
-      </Switch>
-    );
+    return <SwitchRoutes routes={routes} location={location} data={initialData} />;
   }
 }
 
