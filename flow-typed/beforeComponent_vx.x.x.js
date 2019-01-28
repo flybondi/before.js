@@ -119,7 +119,6 @@ declare module 'Before.component' {
   };
 
   declare type SwitchRoutesProps = {
-    +location: LocationType,
     +data: ?DataType,
     +routes: Array<AsyncRoute>
   };

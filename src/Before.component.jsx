@@ -15,18 +15,16 @@ import { converge, find, nthArg, pipe, propEq } from 'ramda';
 import { parse } from 'query-string';
 const { NODE_ENV } = process.env;
 
-const SwitchRoutes = memo(({ location, routes, data }: SwitchRoutesProps) => (
-  <Switch location={location}>
-    {routes.map((route, index) => (
-      <Route
-        key={`route--${index}`}
-        path={route.path}
-        render={createRenderRoute(data, route.component)}
-        exact={route.exact}
-      />
-    ))}
-  </Switch>
-));
+const Routes = memo(({ routes, data }: SwitchRoutesProps) =>
+  routes.map((route, index) => (
+    <Route
+      key={`route--${index}`}
+      path={route.path}
+      render={createRenderRoute(data, route.component)}
+      exact={route.exact}
+    />
+  ))
+);
 
 /**
  * Log the error to console only in development environment and throw up given error;
@@ -131,7 +129,11 @@ export class Before extends Component<BeforeComponentWithRouterProps, BeforeStat
   render() {
     const { routes, location } = this.props;
     const initialData = this.getData();
-    return <SwitchRoutes routes={routes} location={location} data={initialData} />;
+    return (
+      <Switch location={location}>
+        <Routes routes={routes} data={initialData} />
+      </Switch>
+    );
   }
 }
 

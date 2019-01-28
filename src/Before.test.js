@@ -13,6 +13,10 @@ jest.mock('react', () => {
   return { ...r, memo: x => x };
 });
 
+afterAll(() => {
+  jest.resetAllMocks();
+});
+
 test('the rendered component should have a Route component', () => {
   const DummyComponent = () => <span>Hi there!</span>;
   const context = {};
@@ -33,10 +37,11 @@ test('the rendered component should have a Route component', () => {
       <Before {...beforeProps} />
     </StaticRouter>
   );
-  const route = wrapper.find(Switch).childAt(0);
+  const routes = wrapper.find(Switch).childAt(0);
+  const route = routes.childAt(0);
+
   expect(wrapper.find(Switch).props().location).toHaveProperty('pathname', '/');
   expect(wrapper.find(Switch).children()).toHaveLength(1);
-  console.log(route, wrapper, 123);
   expect(route.key()).toEqual('route--0');
   expect(route.props().path).toEqual('/');
   expect(route.props().exact).toBeTruthy();
