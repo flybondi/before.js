@@ -47,6 +47,7 @@ const createRenderRoute = (initialData: ?DataType, Component: FixMeType) => (
 ) => {
   const routeProps = {
     ...initialData,
+    isFetchingInitialProps: initialData === undefined,
     history: props.history,
     location: props.location,
     match: {
@@ -82,7 +83,7 @@ const getCurrentRouteByPath: (
  */
 export class Before extends Component<BeforeComponentWithRouterProps, BeforeState> {
   state = {
-    data: this.props.data
+    data: { [this.props.location.pathname]: this.props.data }
   };
 
   fetchInitialPropsFromCurrentRoute = async (props: BeforeComponentWithRouterProps) => {
@@ -99,13 +100,13 @@ export class Before extends Component<BeforeComponentWithRouterProps, BeforeStat
           ...rest
         });
         return {
-          data
+          data: { [location.pathname]: data }
         };
       }
     } catch (error) {
       throwError(error);
       return {
-        data: null
+        data: {}
       };
     }
   };
@@ -118,17 +119,17 @@ export class Before extends Component<BeforeComponentWithRouterProps, BeforeStat
   }
 
   shouldComponentUpdate(nextProps: BeforeComponentWithRouterProps, nextState: BeforeState) {
-    // NOTE(lf): Allow render only when the routes change.
-    return this.props.location !== nextProps.location;
+    // NOTE(lf): Allow render only when the routes change or the data in the state has changed.
+    return this.props.location !== nextProps.location || this.state.data !== nextState.data;
   }
 
-  getData() {
-    return isClientSide() ? this.state.data : this.props.data;
+  getData({ pathname }) {
+    return isClientSide() && pathname ? this.state.data[pathname] : this.props.data;
   }
 
   render() {
     const { routes, location } = this.props;
-    const initialData = this.getData();
+    const initialData = this.getData(location);
     return (
       <Switch location={location}>
         <Routes routes={routes} data={initialData} />
