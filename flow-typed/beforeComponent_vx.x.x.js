@@ -118,6 +118,11 @@ declare module 'Before.component' {
     entries?: Array<LocationType>
   };
 
+  declare type SwitchRoutesProps = {
+    +data: ?DataType,
+    +routes: Array<AsyncRoute>
+  };
+
   declare type Match = {
     params: { [key: string]: ?string },
     isExact: boolean,
@@ -132,8 +137,7 @@ declare module 'Before.component' {
   |};
 
   declare type BeforeState = {
-    previousLocation: ?LocationType,
-    data: ?DataType
+    data: { [key: string]: any }
   };
 
   declare type StaticRouterContext = {

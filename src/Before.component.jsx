@@ -4,15 +4,27 @@ import type {
   BeforeState,
   BeforeComponentWithRouterProps,
   DataType,
-  FixMeType
+  FixMeType,
+  SwitchRoutesProps
 } from 'Before.component';
-import React, { Component } from 'react';
+import React, { Component, memo } from 'react';
 import { Switch, Route, withRouter, type ContextRouter } from 'react-router-dom';
 import { getInitialPropsFromComponent } from './fetchInitialPropsFromRoute';
 import { isClientSide } from './utils';
 import { converge, find, nthArg, pipe, propEq } from 'ramda';
 import { parse } from 'query-string';
 const { NODE_ENV } = process.env;
+
+const Routes = memo(({ routes, data }: SwitchRoutesProps) =>
+  routes.map((route, index) => (
+    <Route
+      key={`route--${index}`}
+      path={route.path}
+      render={createRenderRoute(data, route.component)}
+      exact={route.exact}
+    />
+  ))
+);
 
 /**
  * Log the error to console only in development environment and throw up given error;
@@ -35,6 +47,7 @@ const createRenderRoute = (initialData: ?DataType, Component: FixMeType) => (
 ) => {
   const routeProps = {
     ...initialData,
+    isFetchingInitialProps: initialData === undefined,
     history: props.history,
     location: props.location,
     match: {
@@ -70,8 +83,7 @@ const getCurrentRouteByPath: (
  */
 export class Before extends Component<BeforeComponentWithRouterProps, BeforeState> {
   state = {
-    previousLocation: this.props.location,
-    data: this.props.data
+    data: { [this.props.location.pathname]: this.props.data }
   };
 
   fetchInitialPropsFromCurrentRoute = async (props: BeforeComponentWithRouterProps) => {
@@ -88,15 +100,13 @@ export class Before extends Component<BeforeComponentWithRouterProps, BeforeStat
           ...rest
         });
         return {
-          previousLocation: location,
-          data
+          data: { [pathname]: data }
         };
       }
     } catch (error) {
       throwError(error);
       return {
-        previousLocation: null,
-        data: null
+        data: {}
       };
     }
   };
@@ -109,28 +119,20 @@ export class Before extends Component<BeforeComponentWithRouterProps, BeforeStat
   }
 
   shouldComponentUpdate(nextProps: BeforeComponentWithRouterProps, nextState: BeforeState) {
-    return nextState.previousLocation !== null;
+    // NOTE(lf): Allow render only when the routes change or the data in the state has changed.
+    return this.props.location !== nextProps.location || this.state.data !== nextState.data;
   }
 
-  getData(path: string) {
-    return isClientSide() ? this.state.data : this.props.data;
+  getData(pathname: string) {
+    return isClientSide() ? this.state.data[pathname] : this.props.data;
   }
 
   render() {
-    const { previousLocation } = this.state;
-    const { location, routes } = this.props;
-    const loc = previousLocation || location;
-    const initialData = this.getData(loc.pathname);
+    const { routes, location } = this.props;
+    const initialData = this.getData(location.pathname);
     return (
-      <Switch location={loc}>
-        {routes.map((route, index) => (
-          <Route
-            key={`route--${index}`}
-            path={route.path}
-            render={createRenderRoute(initialData, route.component)}
-            exact={route.exact}
-          />
-        ))}
+      <Switch location={location}>
+        <Routes routes={routes} data={initialData} />
       </Switch>
     );
   }
