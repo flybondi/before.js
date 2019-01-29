@@ -3,9 +3,9 @@
  */
 
 import React from 'react';
-import Before from './Before.component';
+import BeforeComponent, { Before } from './Before.component';
 import { StaticRouter, Switch } from 'react-router-dom';
-import { mount } from 'enzyme';
+import { mount, shallow } from 'enzyme';
 
 // NOTE(lf): work around until React.memo is fully supported by Jest (https://github.com/airbnb/enzyme/issues/1875)
 jest.mock('react', () => {
@@ -13,8 +13,15 @@ jest.mock('react', () => {
   return { ...r, memo: x => x };
 });
 
+jest.mock('./utils', () => {
+  const { T } = jest.requireActual('ramda');
+  return {
+    isClientSide: T
+  };
+});
+
 afterAll(() => {
-  jest.resetAllMocks();
+  jest.resetModules();
 });
 
 test('the rendered component should have a Route component', () => {
@@ -34,7 +41,7 @@ test('the rendered component should have a Route component', () => {
   };
   const wrapper = mount(
     <StaticRouter location="/" context={context}>
-      <Before {...beforeProps} />
+      <BeforeComponent {...beforeProps} />
     </StaticRouter>
   );
   const routes = wrapper.find(Switch).childAt(0);
@@ -45,4 +52,30 @@ test('the rendered component should have a Route component', () => {
   expect(route.key()).toEqual('route--0');
   expect(route.props().path).toEqual('/');
   expect(route.props().exact).toBeTruthy();
+});
+
+test('fetch initial props from current route component', () => {
+  const getInitialProps = jest.fn().mockReturnValue({ name: 'DummyComponent' });
+  const DummyComponent = () => <span>Hi there!</span>;
+  DummyComponent.getInitialProps = getInitialProps;
+
+  const beforeProps = {
+    location: {
+      pathname: '/'
+    },
+    routes: [
+      {
+        path: '/',
+        component: () => <span>Hi there!</span>
+      },
+      {
+        path: '/props',
+        component: DummyComponent
+      }
+    ],
+    data: {}
+  };
+  const wrapper = shallow(<Before {...beforeProps} />);
+  wrapper.setProps({ location: { pathname: '/props' } });
+  expect(getInitialProps).toHaveBeenCalled();
 });

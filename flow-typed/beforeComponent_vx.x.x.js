@@ -137,7 +137,7 @@ declare module 'Before.component' {
   |};
 
   declare type BeforeState = {
-    data: ?DataType
+    data: { [key: string]: any }
   };
 
   declare type StaticRouterContext = {

@@ -100,7 +100,7 @@ export class Before extends Component<BeforeComponentWithRouterProps, BeforeStat
           ...rest
         });
         return {
-          data: { [location.pathname]: data }
+          data: { [pathname]: data }
         };
       }
     } catch (error) {
@@ -123,13 +123,13 @@ export class Before extends Component<BeforeComponentWithRouterProps, BeforeStat
     return this.props.location !== nextProps.location || this.state.data !== nextState.data;
   }
 
-  getData({ pathname }) {
-    return isClientSide() && pathname ? this.state.data[pathname] : this.props.data;
+  getData(pathname: string) {
+    return isClientSide() ? this.state.data[pathname] : this.props.data;
   }
 
   render() {
     const { routes, location } = this.props;
-    const initialData = this.getData(location);
+    const initialData = this.getData(location.pathname);
     return (
       <Switch location={location}>
         <Routes routes={routes} data={initialData} />
