@@ -35,7 +35,8 @@ export class DocumentComponent extends PureComponent<DocumentInitialProps> {
       errorComponent: ErrorComponent,
       filterServerData = identity,
       extractor,
-      extraHeadTags = []
+      extraHeadTags = [],
+      extraBodyTags = []
     } = this.props;
     // get attributes from React Helmet
     const htmlAttrs = helmet.htmlAttributes.toComponent();
@@ -71,6 +72,9 @@ export class DocumentComponent extends PureComponent<DocumentInitialProps> {
               <Error message={error.message} stack={error.stack} />
             )
           ) : null}
+          {extraBodyTags.map(({ tag: Tag, content, name, attribs }) => (
+            <Tag key={name} {...attribs} dangerouslySetInnerHTML={{ __html: content }} />
+          ))}
         </body>
       </html>
     );
