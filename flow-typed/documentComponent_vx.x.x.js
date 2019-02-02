@@ -69,7 +69,10 @@ declare module 'Document.component' {
     extraHeadTags: Array<{
       name: string,
       tag: string,
-      content: string
+      content: string,
+      attribs?: {
+        [key: string]: string
+      }
     }>,
     [key: string]: any
   };

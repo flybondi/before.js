@@ -57,8 +57,8 @@ export class DocumentComponent extends PureComponent<DocumentInitialProps> {
           {extractor && getHeaderTags(extractor)}
           {criticalCSS !== false && criticalCSS}
           {clientCss && <link rel="stylesheet" href={clientCss} />}
-          {extraHeadTags.map(({ tag: Tag, content, name }) => (
-            <Tag key={name} dangerouslySetInnerHTML={{ __html: content }} />
+          {extraHeadTags.map(({ tag: Tag, content, name, attribs }) => (
+            <Tag key={name} {...attribs} dangerouslySetInnerHTML={{ __html: content }} />
           ))}
         </head>
         <body {...bodyAttrs}>
