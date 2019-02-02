@@ -66,6 +66,14 @@ declare module 'Document.component' {
     errorComponent: React$ComponentType<ErrorProps>,
     filterServerData: (data: DataType) => DataType,
     html: string,
+    extraHeadTags: Array<{
+      name: string,
+      tag: string,
+      content: string,
+      attribs?: {
+        [key: string]: string
+      }
+    }>,
     [key: string]: any
   };
 
