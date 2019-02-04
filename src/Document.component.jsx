@@ -1,5 +1,11 @@
 // @flow strict
-import type { DocumentInitialProps, Context, Extractor, DataType } from 'Document.component';
+import type {
+  ExtraTag,
+  DocumentInitialProps,
+  Context,
+  Extractor,
+  DataType
+} from 'Document.component';
 import React, { PureComponent } from 'react';
 import { F, identity, path } from 'ramda';
 import Error from './Error.component';
@@ -10,6 +16,10 @@ const getHeaderTags = (extractor: Extractor) => [
   ...extractor.getStyleElements(),
   ...extractor.getLinkElements()
 ];
+
+const renderTags = ({ tag: Tag, content, name, attribs }: ExtraTag) => (
+  <Tag key={name} {...attribs} dangerouslySetInnerHTML={{ __html: content }} />
+);
 
 export class DocumentComponent extends PureComponent<DocumentInitialProps> {
   static async getInitialProps({
@@ -58,9 +68,7 @@ export class DocumentComponent extends PureComponent<DocumentInitialProps> {
           {extractor && getHeaderTags(extractor)}
           {criticalCSS !== false && criticalCSS}
           {clientCss && <link rel="stylesheet" href={clientCss} />}
-          {extraHeadTags.map(({ tag: Tag, content, name, attribs }) => (
-            <Tag key={name} {...attribs} dangerouslySetInnerHTML={{ __html: content }} />
-          ))}
+          {extraHeadTags.map(renderTags)}
         </head>
         <body {...bodyAttrs}>
           <Root />
@@ -72,9 +80,7 @@ export class DocumentComponent extends PureComponent<DocumentInitialProps> {
               <Error message={error.message} stack={error.stack} />
             )
           ) : null}
-          {extraBodyTags.map(({ tag: Tag, content, name, attribs }) => (
-            <Tag key={name} {...attribs} dangerouslySetInnerHTML={{ __html: content }} />
-          ))}
+          {extraBodyTags.map(renderTags)}
         </body>
       </html>
     );
