@@ -1,5 +1,11 @@
 // @flow strict
-import type { DocumentInitialProps, Context, Extractor, DataType } from 'Document.component';
+import type {
+  ExtraTag,
+  DocumentInitialProps,
+  Context,
+  Extractor,
+  DataType
+} from 'Document.component';
 import React, { PureComponent } from 'react';
 import { F, identity, path } from 'ramda';
 import Error from './Error.component';
@@ -10,6 +16,10 @@ const getHeaderTags = (extractor: Extractor) => [
   ...extractor.getStyleElements(),
   ...extractor.getLinkElements()
 ];
+
+const renderTags = ({ tag: Tag, content, name, attribs }: ExtraTag) => (
+  <Tag key={name} {...attribs} dangerouslySetInnerHTML={{ __html: content }} />
+);
 
 export class DocumentComponent extends PureComponent<DocumentInitialProps> {
   static async getInitialProps({
@@ -34,7 +44,9 @@ export class DocumentComponent extends PureComponent<DocumentInitialProps> {
       error,
       errorComponent: ErrorComponent,
       filterServerData = identity,
-      extractor
+      extractor,
+      extraHeadTags = [],
+      extraBodyTags = []
     } = this.props;
     // get attributes from React Helmet
     const htmlAttrs = helmet.htmlAttributes.toComponent();
@@ -45,7 +57,10 @@ export class DocumentComponent extends PureComponent<DocumentInitialProps> {
         <head>
           <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
           <meta charSet="utf-8" />
-          <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no" />
+          <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no"
+          />
           {helmet.title.toComponent()}
           {helmet.meta.toComponent()}
           {helmet.link.toComponent()}
@@ -53,6 +68,7 @@ export class DocumentComponent extends PureComponent<DocumentInitialProps> {
           {extractor && getHeaderTags(extractor)}
           {criticalCSS !== false && criticalCSS}
           {clientCss && <link rel="stylesheet" href={clientCss} />}
+          {extraHeadTags.map(renderTags)}
         </head>
         <body {...bodyAttrs}>
           <Root />
@@ -64,6 +80,7 @@ export class DocumentComponent extends PureComponent<DocumentInitialProps> {
               <Error message={error.message} stack={error.stack} />
             )
           ) : null}
+          {extraBodyTags.map(renderTags)}
         </body>
       </html>
     );

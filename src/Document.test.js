@@ -120,3 +120,50 @@ test('should call the function to generate the critical CSS', () => {
     })
   );
 });
+
+test('should render the extra html tags in the `head`', () => {
+  const documentProps = {
+    helmet: {
+      title: {
+        toComponent: jest.fn()
+      },
+      meta: {
+        toComponent: jest.fn()
+      },
+      link: {
+        toComponent: jest.fn()
+      },
+      script: {
+        toComponent: jest.fn()
+      },
+      htmlAttributes: {
+        toComponent: jest.fn()
+      },
+      bodyAttributes: {
+        toComponent: jest.fn()
+      }
+    },
+    assets: {
+      client: {
+        css: 'css-path.css',
+        js: 'js-path.js'
+      }
+    },
+    data: {
+      test: true,
+      shouldFilterMe: true
+    },
+    filterServerData: jest.fn().mockImplementation(({ shouldFilterMe, ...rest }) => rest),
+    extraHeadTags: [
+      {
+        name: 'raygun',
+        tag: 'script',
+        content: `console.log('some-script');`
+      }
+    ]
+  };
+  const wrapper = mount(<Document {...documentProps} />);
+  const extraTag = wrapper.find('head script');
+
+  expect(extraTag.text()).toBe(documentProps.extraHeadTags[0].content);
+});
