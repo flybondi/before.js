@@ -53,6 +53,15 @@ declare module 'Document.component' {
     error: Error
   };
 
+  declare type ExtraTag = {
+    name: string,
+    tag: string,
+    content: string,
+    attribs?: {
+      [key: string]: string
+    }
+  };
+
   declare type DocumentInitialProps = {
     assets: Assets,
     criticalCSS: boolean | string,
@@ -66,14 +75,8 @@ declare module 'Document.component' {
     errorComponent: React$ComponentType<ErrorProps>,
     filterServerData: (data: DataType) => DataType,
     html: string,
-    extraHeadTags: Array<{
-      name: string,
-      tag: string,
-      content: string,
-      attribs?: {
-        [key: string]: string
-      }
-    }>,
+    extraHeadTags: Array<ExtraTag>,
+    extraBodyTags: Array<ExtraTag>,
     [key: string]: any
   };
 
