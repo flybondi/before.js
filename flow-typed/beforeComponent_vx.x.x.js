@@ -76,7 +76,7 @@ declare module 'Before.component' {
     generateCriticalCSS?: () => string | boolean,
     title?: string,
     extractor?: ?Extractor,
-    location?: LocationType,
+    location: LocationType,
     [key: string]: any
   };
 
