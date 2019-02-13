@@ -24,7 +24,7 @@ afterAll(() => {
   jest.resetModules();
 });
 
-test('the rendered component should have a Route component', () => {
+xtest('the rendered component should have a Route component', () => {
   const DummyComponent = () => <span>Hi there!</span>;
   const context = {};
   const beforeProps = {
@@ -54,7 +54,7 @@ test('the rendered component should have a Route component', () => {
   expect(route.props().exact).toBeTruthy();
 });
 
-test('fetch initial props from current route component', () => {
+xtest('fetch initial props from current route component', () => {
   const getInitialProps = jest.fn().mockReturnValue({ name: 'DummyComponent' });
   const DummyComponent = () => <span>Hi there!</span>;
   DummyComponent.getInitialProps = getInitialProps;
