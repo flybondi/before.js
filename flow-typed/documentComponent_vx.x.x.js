@@ -29,7 +29,7 @@ declare module 'Document.component' {
 
   declare type TagMethods = {
     toString(): string,
-    toComponent(): Array<React$Element<any>> | React$Element<any> | Array<Object>
+    toComponent(): [React$Element<*>] | React$Element<*> | Array<Object>
   };
 
   declare type AttributeTagMethods = {
@@ -66,22 +66,30 @@ declare module 'Document.component' {
     assets: Assets,
     criticalCSS: boolean | string,
     data: DataType,
-    renderPage: (data: { [key: string]: any }) => Promise<any>,
-    generateCriticalCSS: () => string | boolean,
+    renderPage?: (data: { [key: string]: any }) => Promise<any>,
+    generateCriticalCSS?: () => string | boolean,
     title: string,
-    extractor: Extractor,
+    extractor: ?Extractor,
     helmet: Helmet,
     error: Error,
-    errorComponent: React$ComponentType<ErrorProps>,
-    filterServerData: (data: DataType) => DataType,
+    errorComponent?: React$ComponentType<ErrorProps>,
+    filterServerData?: (data: DataType) => DataType,
+    extraHeadTags?: Array<ExtraTag>,
+    extraBodyTags?: Array<ExtraTag>,
+    [key: string]: any
+  };
+
+  declare type DocumentGetInitialProps = {
+    criticalCSS: boolean | string,
+    assets: Assets,
+    data: DataType,
+    extractor: Extractor,
     html: string,
-    extraHeadTags: Array<ExtraTag>,
-    extraBodyTags: Array<ExtraTag>,
     [key: string]: any
   };
 
   declare type DocumentComponent = {
-    getInitialProps(context: Context): Promise<DocumentInitialProps>
+    getInitialProps(context: Context): Promise<DocumentGetInitialProps>
   } & $Subtype<React$ComponentType<DocumentInitialProps>>;
 
   declare module.exports: {

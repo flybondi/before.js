@@ -177,21 +177,39 @@ export async function render({
       return res.redirect(301, originalUrl.replace(route.path, route.redirectTo));
     }
   }
-
-  const docProps = await Document.getInitialProps({
-    req,
-    res,
-    assets,
-    renderPage,
-    data,
-    filterServerData,
-    generateCriticalCSS,
-    title,
-    extractor,
-    ...rest,
-    error: isError(data) && data,
-    match: route
-  });
-  const { html } = docProps;
-  return parseDocument(Document, docProps, html);
+  let parsedDocument = '';
+  try {
+    const docProps = await Document.getInitialProps({
+      req,
+      res,
+      assets,
+      renderPage,
+      data,
+      filterServerData,
+      generateCriticalCSS,
+      title,
+      extractor,
+      ...rest,
+      error: isError(data) && data,
+      match: route
+    });
+    const { html } = docProps;
+    parsedDocument = parseDocument(Document, docProps, html);
+  } catch (error) {
+    console.error('There was an error while trying to render the initial document', error);
+    parsedDocument = parseDocument(
+      Document,
+      {
+        assets,
+        error,
+        extractor,
+        data: {},
+        helmet: Helmet.renderStatic(),
+        criticalCSS: generateCriticalCSS(),
+        title
+      },
+      ''
+    );
+  }
+  return parsedDocument;
 }

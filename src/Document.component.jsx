@@ -2,6 +2,7 @@
 import type {
   ExtraTag,
   DocumentInitialProps,
+  DocumentGetInitialProps,
   Context,
   Extractor,
   DataType
@@ -81,7 +82,7 @@ DocumentComponent.getInitialProps = async ({
   generateCriticalCSS = F,
   extractor,
   ...rest
-}: Context): Promise<DocumentInitialProps> => {
+}: Context): Promise<DocumentGetInitialProps> => {
   const page = await renderPage(data);
   const criticalCSS = generateCriticalCSS();
   return { assets, criticalCSS, data, extractor, ...rest, ...page };
