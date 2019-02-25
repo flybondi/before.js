@@ -1,6 +1,6 @@
 {
   "parser": "babel-eslint",
-  "plugins": ["flowtype", "ramda", "react"],
+  "plugins": ["flowtype", "ramda", "react", "react-hooks"],
   "extends": [
     "standard",
     "plugin:flowtype/recommended",
