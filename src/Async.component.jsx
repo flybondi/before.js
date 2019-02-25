@@ -23,10 +23,10 @@ export function asyncComponent({ LoadableComponent, loader }: AsyncOptions) {
     });
   };
 
-  AsyncRouteComponent.getInitialProps = async (context: Context) =>
-    Component !== null && Component.getInitialProps
-      ? Component.getInitialProps(context)
-      : Promise.resolve(null);
+  AsyncRouteComponent.getInitialProps = async (context: Context) => {
+    const component = Component || (await AsyncRouteComponent.load());
+    return component.getInitialProps ? component.getInitialProps(context) : Promise.resolve(null);
+  };
 
   return AsyncRouteComponent;
 }

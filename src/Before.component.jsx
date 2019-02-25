@@ -9,7 +9,7 @@ import type {
 import React, { useState, useEffect, useCallback } from 'react';
 import { parse } from 'query-string';
 import { withRouter, Switch, Route, type ContextRouter } from 'react-router-dom';
-import { converge, find, nthArg, pipe, pathOr, propEq } from 'ramda';
+import { converge, find, nthArg, pipe, propOr, propEq } from 'ramda';
 import { isClientSide } from './utils';
 
 /**
