@@ -46,7 +46,7 @@ const getPageProps = (
   match: {
     ...match,
     // $FlowFixMe Ramda path type is not working as expected
-    querystring: isClientSide() ? parse(search) : pathOr({}, ['query'], req)
+    querystring: isClientSide() ? parse(search) : propOr({}, 'query', req)
   }
 });
 
