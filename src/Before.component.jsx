@@ -3,14 +3,13 @@ import type {
   AsyncRoute,
   BeforeComponentWithRouterProps,
   Context,
-  Match,
   InitialProps,
-  LocationType
+  Request
 } from 'Before.component';
 import React, { useState, useEffect, useCallback } from 'react';
 import { parse } from 'query-string';
-import { withRouter, Switch, Route } from 'react-router-dom';
-import { converge, find, nthArg, pipe, propEq } from 'ramda';
+import { withRouter, Switch, Route, type ContextRouter } from 'react-router-dom';
+import { converge, find, nthArg, pipe, pathOr, propEq } from 'ramda';
 import { isClientSide } from './utils';
 
 /**
@@ -33,15 +32,21 @@ const getCurrentRouteByPath: (path: string, routes: Array<AsyncRoute>) => ?Async
 
 /**
  * Inject querystring into the react-router match object
- * @param {object} match react-router match
- * @param {object} location react-router Location
+ * @param {object} context react-router context router
  * @param {object} props component inital props
+ * @param {object} req server-side request object
  */
-const getPageProps = (match: Match, { search }: LocationType, props: InitialProps) => ({
+const getPageProps = (
+  { match, location: { search }, history }: ContextRouter,
+  props: InitialProps,
+  req: Request
+) => ({
   ...props,
+  history,
   match: {
     ...match,
-    querystring: parse(search)
+    // $FlowFixMe Ramda path type is not working as expected
+    querystring: isClientSide() ? parse(search) : pathOr({}, ['query'], req)
   }
 });
 
@@ -78,7 +83,7 @@ const fetchInitialProps = async (
  * @function
  */
 export function Before(props: BeforeComponentWithRouterProps) {
-  const { data, routes, location } = props;
+  const { data, routes, location, req } = props;
   const { pathname, key } = location;
   const [currentLocation, setCurrentLocation] = useState(location);
   const [isFetching, setIsFetching] = useState(false);
@@ -120,16 +125,18 @@ export function Before(props: BeforeComponentWithRouterProps) {
   const routeProps = initialProps[currentLocation.pathname];
   return (
     <Switch location={currentLocation}>
-      {routes.map(({ component: Component, exact, path }, index) => (
-        <Route
-          key={index}
-          path={path}
-          exact={exact}
-          render={({ match, location }) => (
-            <Component {...getPageProps(match, location, routeProps)} />
-          )}
-        />
-      ))}
+      {routes.map(({ component: Component, exact, path }, index) => {
+        return (
+          <Route
+            key={index}
+            path={path}
+            exact={exact}
+            render={(context: ContextRouter) => (
+              <Component {...getPageProps(context, routeProps, req)} />
+            )}
+          />
+        );
+      })}
     </Switch>
   );
 }
