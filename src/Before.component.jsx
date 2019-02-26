@@ -4,13 +4,12 @@ import type {
   BeforeComponentWithRouterProps,
   Context,
   InitialProps,
-  Request
+  QueryType
 } from 'Before.component';
 import React, { useState, useEffect, useCallback } from 'react';
-import { parse } from 'query-string';
 import { withRouter, Switch, Route, type ContextRouter } from 'react-router-dom';
-import { converge, find, nthArg, pipe, propOr, propEq } from 'ramda';
-import { isClientSide } from './utils';
+import { converge, find, nthArg, pipe, propEq } from 'ramda';
+import { isClientSide, getQueryString } from './utils';
 
 /**
  * Retrieve the current route by a given path.
@@ -39,15 +38,12 @@ const getCurrentRouteByPath: (path: string, routes: Array<AsyncRoute>) => ?Async
 const getPageProps = (
   { match, location: { search }, history }: ContextRouter,
   props: InitialProps,
-  req: Request
+  req: { query: QueryType }
 ) => ({
   ...props,
   history,
-  match: {
-    ...match,
-    // $FlowFixMe Ramda path type is not working as expected
-    querystring: isClientSide() ? parse(search) : propOr({}, 'query', req)
-  }
+  query: getQueryString(location, req),
+  match
 });
 
 /**
@@ -106,8 +102,10 @@ export function Before(props: BeforeComponentWithRouterProps) {
   useEffect(() => {
     if (isFetching && nextLocation) {
       const route = getRoute(nextLocation.pathname, routes);
-      fetchInitialProps(route, { ...props, location: nextLocation }, data =>
-        setInitialProps({ ...initialProps, ...data })
+      fetchInitialProps(
+        route,
+        { ...props, location: nextLocation, query: getQueryString(nextLocation, req) },
+        data => setInitialProps({ ...initialProps, ...data })
       );
     }
   }, [nextLocation]);

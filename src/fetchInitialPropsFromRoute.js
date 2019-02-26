@@ -2,8 +2,7 @@
 import type { AsyncFixMeComponentType, Context, Route } from 'fetchInitialPropsFromRoutes';
 import { matchPath, type Match } from 'react-router-dom';
 import { complement, has, find, isNil } from 'ramda';
-import { parse } from 'query-string';
-import { isClientSide } from './utils';
+import { getQueryString } from './utils';
 
 /**
  * Check if given value is not null or undefined.
@@ -60,18 +59,6 @@ const defaultContext = {
 };
 
 /**
- * Retrieve the querystring value from the location object if we are in the client or
- * from the request query if we are in the server.
- * @param {Location} location a request location object
- * @param {Request} req a request object
- * @returns {string}
- */
-const getQueryString = (location = {}, { query }) => {
-  const { search } = location;
-  return isClientSide() ? parse(search) : query;
-};
-
-/**
  * Retrieve the initial props from given component.
  * @param {React$PureComponent} component to fetch the initial props
  * @param {Match|Route} match react-router match or route object
@@ -86,7 +73,6 @@ export const getInitialPropsFromComponent = async (
   if (match && hasGetInitialProps(component)) {
     const location = isNotNil(context.location) ? context.location : { search: '' };
     const req = isNotNil(context.req) ? context.req : { query: {} };
-    const querystring = getQueryString(location, req);
     try {
       if (hasLoad(component)) {
         await component.load();
@@ -94,10 +80,8 @@ export const getInitialPropsFromComponent = async (
       return await component.getInitialProps({
         // Note: context contains the old `match` too, so it's important to overwrite that with the new `match`
         ...context,
-        match: {
-          ...match,
-          querystring
-        }
+        query: getQueryString(location, req),
+        match
       });
     } catch (error) {
       console.error('There was an error while trying to retrieve the initial props', error);

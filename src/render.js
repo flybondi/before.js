@@ -10,7 +10,7 @@ import { ChunkExtractor, ChunkExtractorManager } from '@loadable/server';
 import { DocumentComponent as DefaultDoc } from './Document.component';
 import { fetchInitialPropsFromRoute } from './fetchInitialPropsFromRoute';
 import { isError, isPromise } from './utils';
-import { complement, isEmpty } from 'ramda';
+import { complement, isEmpty, F } from 'ramda';
 import { StaticRouter } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import Before from './Before.component';
@@ -142,7 +142,7 @@ export async function render({
   assets,
   document: Document = DefaultDoc,
   filterServerData,
-  generateCriticalCSS,
+  generateCriticalCSS = F,
   customRenderer,
   statsPath,
   title,
