@@ -36,7 +36,7 @@ const getCurrentRouteByPath: (path: string, routes: Array<AsyncRoute>) => ?Async
  * @param {object} req server-side request object
  */
 const getPageProps = (
-  { match, location: { search }, history }: ContextRouter,
+  { match, location, history }: ContextRouter,
   props: InitialProps,
   req: { query: QueryType }
 ) => ({
