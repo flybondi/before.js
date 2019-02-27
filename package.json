@@ -1,6 +1,6 @@
 {
   "name": "@flybondi/before.js",
-  "version": "0.0.0-development",
+  "version": "0.0.9-development.hooks",
   "description": "Enables data fetching with any React SSR app that uses React Router 4",
   "main": "dist/index.js",
   "module": "dist/index.es.js",
