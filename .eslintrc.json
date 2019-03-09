@@ -21,6 +21,8 @@
   "rules": {
     "semi": [2, "always"],
     "no-extra-semi": 2,
-    "react/display-name": 0
+    "react/display-name": 0,
+    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": "warn"
   }
 }
