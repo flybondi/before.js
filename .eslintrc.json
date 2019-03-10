@@ -1,6 +1,6 @@
 {
   "parser": "babel-eslint",
-  "plugins": ["flowtype", "ramda", "react"],
+  "plugins": ["flowtype", "ramda", "react", "react-hooks"],
   "extends": [
     "standard",
     "plugin:flowtype/recommended",
@@ -21,6 +21,8 @@
   "rules": {
     "semi": [2, "always"],
     "no-extra-semi": 2,
-    "react/display-name": 0
+    "react/display-name": 0,
+    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": "warn"
   }
 }

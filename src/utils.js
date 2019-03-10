@@ -1,6 +1,7 @@
 // @flow strict
 import { anyPass, equals, is, complement } from 'ramda';
-
+import { parse } from 'query-string';
+import type { QueryType } from 'Before.component';
 /**
  * Check if given argument has a null value.
  * @func
@@ -26,7 +27,6 @@ try {
  * @param {function} fn to compare
  * @returns {boolean}
  */
-// $FlowFixMe
 const isGeneratorFunction = fn => {
   const toStringCheck = Object.prototype.toString.call(fn) === '[object GeneratorFunction]';
   const legacyConstructorCheck = isNotNull(GeneratorFunction) && fn instanceof GeneratorFunction;
@@ -39,7 +39,6 @@ const isGeneratorFunction = fn => {
  * @param {function} fn to compare
  * @returns {boolean}
  */
-// $FlowFixMe
 const isAsyncFunction = fn => Object.prototype.toString.call(fn) === '[object AsyncFunction]';
 
 /**
@@ -87,3 +86,16 @@ export const isServerSide: () => boolean = () =>
  * @returns {boolean}
  */
 export const isClientSide: () => boolean = complement(isServerSide);
+
+/**
+ * Retrieve the querystring value from the location object if we are in the client or
+ * from the request query if we are in the server.
+ * @func
+ * @param {Location} location a request location object
+ * @param {Request} req a request object
+ * @returns {object}
+ */
+export const getQueryString = (
+  { search }: { search: string } = {},
+  { query }: { query: QueryType } = {}
+) => (isClientSide() ? parse(search) : query);

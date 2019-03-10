@@ -76,7 +76,7 @@ declare module 'Before.component' {
     generateCriticalCSS?: () => string | boolean,
     title?: string,
     extractor?: ?Extractor,
-    location?: LocationType,
+    location: LocationType,
     [key: string]: any
   };
 
@@ -137,11 +137,26 @@ declare module 'Before.component' {
   |};
 
   declare type BeforeState = {
-    data: { [key: string]: any }
+    currentLocation: LocationType,
+    isFetching: boolean,
+    nextLocation: ?LocationType,
+    initialProps: DataType
+  };
+
+  declare type BeforeAction = {
+    type: 'start' | 'end',
+    location: LocationType,
+    props?: DataType
   };
 
   declare type StaticRouterContext = {
     url?: string
+  };
+
+  declare type ShouldRenderProps = {
+    children: React$Element<FixMeType>,
+    isFetching: boolean,
+    location: LocationType
   };
 
   declare type BeforeComponentWithRouterProps = {|
@@ -154,24 +169,16 @@ declare module 'Before.component' {
     +req: Request
   |};
 
-  declare class BeforeComponent extends React$Component<
-    BeforeComponentWithRouterProps,
-    BeforeState
-  > {
-    constructor(props: BeforeComponentWithRouterProps): void;
-    prefetchInitialPropsFromAllRoutes(): void;
-    componentDidUpdate(prevProps: BeforeComponentWithRouterProps): void;
-    shouldComponentUpdate(
-      nextProps: BeforeComponentWithRouterProps,
-      nextState: BeforeState
-    ): boolean;
-    getData(path: string): ?DataType;
-    render(): React$Element<
-      Class<React$Component<{| children?: React$Node, location?: LocationType |}>>
-    >;
-  }
-
   declare module.exports: {
-    Before: typeof BeforeComponent
+    Before: (
+      props: BeforeComponentWithRouterProps
+    ) => React$Element<
+      Class<
+        React$Component<{|
+          children?: Node,
+          location?: Location
+        |}>
+      >
+    >
   };
 }

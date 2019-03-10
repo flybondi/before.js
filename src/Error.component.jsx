@@ -10,14 +10,18 @@ import React from 'react';
  * @param {object} Props component props
  * @returns {React$Element<'article'>}
  */
-const Error = ({ className = 'w-75 center mt6', message, stack }: ErrorProps) => (
-  <article className={className}>
-    <span className="tc w-100 db" style={{ fontSize: '120px' }} role="img" aria-label="scream">
+const Error = ({ message, stack }: ErrorProps) => (
+  <article style={{ width: '75%', textAlign: 'center', marginLeft: 'auto', marginRight: 'auto' }}>
+    <span
+      style={{ fontSize: '120px', display: 'block', width: '100%' }}
+      role="img"
+      aria-label="scream"
+    >
       😱
     </span>
-    <h1 className="f1 font-p-semibold tc">Whoops!</h1>
-    <h2 className="f2 font-p tc">Something went wrong.</h2>
-    <section className="f6">
+    <h1>Whoops!</h1>
+    <h2>Something went wrong.</h2>
+    <section style={{ fontSize: '.75rem' }}>
       <p>
         <strong>{message}</strong>
       </p>

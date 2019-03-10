@@ -29,7 +29,8 @@ test('should use the default document', async () => {
   const options = {
     req: {
       path: '/',
-      originalUrl: 'https://test.com'
+      originalUrl: 'https://test.com',
+      query: {}
     },
     res: {
       redirect: jest.fn(),
