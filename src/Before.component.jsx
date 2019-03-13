@@ -154,7 +154,7 @@ export function Before(props: BeforeComponentWithRouterProps) {
 const ShouldRender = memo(
   ({ children }: ShouldRenderProps) => children,
   (prevProps: ShouldRenderProps, nextProps: ShouldRenderProps) => {
-    return !nextProps.isFetching && nextProps.location !== prevProps.location;
+    return !nextProps.isFetching && nextProps.location === prevProps.location;
   }
 );
 
