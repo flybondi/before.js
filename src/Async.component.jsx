@@ -17,7 +17,8 @@ export function asyncComponent({ LoadableComponent, loader }: AsyncOptions) {
   };
 
   AsyncRouteComponent.load = async (): Promise<ComponentType<AsyncProps>> => {
-    return loader().then(component => {
+    const loaderFn = loader.requireAsync || loader;
+    return loaderFn().then(component => {
       Component = component.default || component;
       return Component;
     });
