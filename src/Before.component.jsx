@@ -207,8 +207,10 @@ export function Before(props: BeforeComponentWithRouterProps) {
       }
     });
     return unlisten;
+    // note(lf): I don't want to re-create this effect each time the react-router history change, which changes on each update to the location.
+    // Keeping the history object outside the dependency array, will garauntee that we are always listeners is working a expected.
     // eslint-disable-next-line
-  }, [initialProps, routes]);
+  }, [initialProps, props, routes]);
 
   const beforeHistory = useMemo(
     () => ({
