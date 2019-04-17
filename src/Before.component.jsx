@@ -22,27 +22,40 @@ import {
   ifElse,
   last,
   nthArg,
-  pathOr,
-  pipe,
+  propOr,
   prop,
   propEq,
   split
 } from 'ramda';
 import { getQueryString } from './utils';
 
-const getBasePath: (pathname: string) => string = pipe(
-  split('?'),
-  head
+/**
+ * Extract the base path from given full pathname, for example given the following url `/foo?bar=2`
+ * will return `/foo`.
+ * @func
+ * @param {string} pathname the pathname to retrieve the pathname
+ * @returns {string} the base path
+ */
+const getBasePath: (pathname: string) => string = compose(
+  head,
+  split('?')
 );
 
-const getSearch: (path: string | LocationType) => string = ifElse(
+/**
+ * Extract the search part of a given full pathname or window.Location, for example given the following url `/foo?bar=2`
+ * will return `?bar=2`.
+ * @func
+ * @param {string|object} pathname | Location
+ * @returns {string} the querystring
+ */
+const getSearch: (pathname: string | LocationType) => string = ifElse(
   has('search'),
   prop('search'),
   compose(
     concat('?'),
-    pipe(
-      split('?'),
-      last
+    compose(
+      last,
+      split('?')
     )
   )
 );
@@ -57,10 +70,10 @@ const getSearch: (path: string | LocationType) => string = ifElse(
 const getRouteByPathname: (path: string, routes: Array<AsyncRoute>) => ?AsyncRoute = converge(
   find,
   [
-    pipe(
-      nthArg(0),
+    compose(
+      propEq('path'),
       getBasePath,
-      propEq('path')
+      nthArg(0)
     ),
     nthArg(1)
   ]
@@ -102,16 +115,16 @@ const getPageProps = (
 const fetchInitialProps = async (
   route: AsyncRoute,
   context: Context,
-  dispatch: (props: ?InitialProps) => void
+  next: (props: ?InitialProps) => void
 ) => {
   try {
     const { component } = route;
     if (component && component.getInitialProps) {
       const data = await component.getInitialProps(context);
-      dispatch(data);
+      next(data);
     }
   } catch (error) {
-    dispatch(null);
+    next();
   }
 };
 
@@ -122,15 +135,10 @@ const fetchInitialProps = async (
  * @param {object} action The dispatched action
  * @return object
  */
-const reducer = (state: BeforeState, { location, props, type }: BeforeAction) => {
+const reducer = (state: BeforeState, { location, type }: BeforeAction) => {
   switch (type) {
     case 'update-location':
-      return { ...state, currentLocation: location };
-    case 'update-props-location':
-      return {
-        currentLocation: location,
-        initialProps: { ...state.initialProps, ...props }
-      };
+      return { currentLocation: location };
     default:
       throw new Error('Invalid reducer type');
   }
@@ -144,15 +152,15 @@ const reducer = (state: BeforeState, { location, props, type }: BeforeAction) =>
 export function Before(props: BeforeComponentWithRouterProps) {
   const { data, routes, location, req, history } = props;
   const [state, dispatch] = useReducer(reducer, {
-    currentLocation: location,
-    initialProps: { [location.pathname]: data }
+    currentLocation: location
   });
+  const { currentLocation } = state;
   const interrupt = useRef(false);
-  const { currentLocation, initialProps } = state;
+  const initialProps = useRef({ [currentLocation.pathname]: data });
 
   const createHistoryMethod = useCallback(
     (name: string) => (obj: string | LocationType, state?: { [key: string]: string }) => {
-      const path = pathOr(obj, ['pathname'], obj);
+      const path: string = propOr(obj, 'pathname', obj);
       const route = getRouteByPathname(path, routes);
       if (route) {
         const search = getSearch(obj);
@@ -165,18 +173,18 @@ export function Before(props: BeforeComponentWithRouterProps) {
           },
           props => {
             if (!interrupt.current) {
+              initialProps.current[route.path] = props;
               dispatch({
-                type: 'update-props-location',
+                type: 'update-location',
                 location: {
                   hash: '',
-                  key: `before-key-${createLocationKey()}`,
+                  key: `before-${createLocationKey()}`,
                   pathname: route.path,
                   search,
                   state
-                },
-                props: { [route.path]: props }
+                }
               });
-              history[name](path, state);
+              history[name](obj, state);
             }
           }
         );
@@ -188,7 +196,7 @@ export function Before(props: BeforeComponentWithRouterProps) {
   useEffect(() => {
     const unlisten = history.listen((location, action) => {
       interrupt.current = action === 'POP';
-      if (!initialProps[location.pathname]) {
+      if (!initialProps.current[location.pathname]) {
         // This solves a wierd case where landing on an advance step of the flow and the user does a browser back.
         const route = getRouteByPathname(location.pathname, routes);
         if (route) {
@@ -196,7 +204,8 @@ export function Before(props: BeforeComponentWithRouterProps) {
             route,
             { ...props, location, query: getQueryString(location) },
             props => {
-              dispatch({ type: 'update-props-location', location, props: { [route.path]: props } });
+              initialProps.current[route.path] = props;
+              dispatch({ type: 'update-location', location });
               interrupt.current = false;
             }
           );
@@ -210,7 +219,7 @@ export function Before(props: BeforeComponentWithRouterProps) {
     // note(lf): I don't want to re-create this effect each time the react-router history change, which changes on each update to the location.
     // Keeping the history object outside the dependency array, will garauntee that we are always listeners is working a expected.
     // eslint-disable-next-line
-  }, [initialProps, props, routes]);
+  }, []);
 
   const beforeHistory = useMemo(
     () => ({
@@ -223,7 +232,7 @@ export function Before(props: BeforeComponentWithRouterProps) {
     [history, createHistoryMethod]
   );
 
-  const routeProps = initialProps[currentLocation.pathname];
+  const routeProps = initialProps.current[currentLocation.pathname];
   return (
     <Switch location={currentLocation}>
       {routes.map(({ component: Component, exact, path }, index) => {

@@ -139,8 +139,7 @@ declare module 'Before.component' {
   |};
 
   declare type BeforeState = {
-    currentLocation: LocationType,
-    initialProps: DataType
+    currentLocation: LocationType
   };
 
   declare type BeforeAction = {
