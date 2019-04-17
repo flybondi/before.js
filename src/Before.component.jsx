@@ -197,7 +197,7 @@ export function Before(props: BeforeComponentWithRouterProps) {
     const unlisten = history.listen((location, action) => {
       interrupt.current = action === 'POP';
       if (!initialProps.current[location.pathname]) {
-        // This solves a wierd case where landing on an advance step of the flow and the user does a browser back.
+        // This solves a weird case when, on an advanced step of the flow, the user does a browser back
         const route = getRouteByPathname(location.pathname, routes);
         if (route) {
           fetchInitialProps(
