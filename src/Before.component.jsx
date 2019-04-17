@@ -15,17 +15,17 @@ import { withRouter, Switch, Route, type ContextRouter } from 'react-router-dom'
 import {
   compose,
   concat,
-  converge,
   find,
   has,
   head,
   ifElse,
+  identity,
   last,
-  nthArg,
   propOr,
   prop,
   propEq,
-  split
+  split,
+  useWith
 } from 'ramda';
 import { getQueryString } from './utils';
 
@@ -53,10 +53,8 @@ const getSearch: (pathname: string | LocationType) => string = ifElse(
   prop('search'),
   compose(
     concat('?'),
-    compose(
-      last,
-      split('?')
-    )
+    last,
+    split('?')
   )
 );
 
@@ -67,17 +65,13 @@ const getSearch: (pathname: string | LocationType) => string = ifElse(
  * @param {array} routes an array of route to filter
  * @returs {object|undefined} a valid route
  **/
-const getRouteByPathname: (path: string, routes: Array<AsyncRoute>) => ?AsyncRoute = converge(
-  find,
-  [
-    compose(
-      propEq('path'),
-      getBasePath,
-      nthArg(0)
-    ),
-    nthArg(1)
-  ]
-);
+const getRouteByPathname: (path: string, routes: Array<AsyncRoute>) => ?AsyncRoute = useWith(find, [
+  compose(
+    propEq('path'),
+    getBasePath
+  ),
+  identity
+]);
 
 /**
  * Generates a random string
@@ -115,7 +109,7 @@ const getPageProps = (
 const fetchInitialProps = async (
   route: AsyncRoute,
   context: Context,
-  next: (props: ?InitialProps) => void
+  next: (props: ?InitialProps, error?: Error) => void
 ) => {
   try {
     const { component } = route;
@@ -124,7 +118,7 @@ const fetchInitialProps = async (
       next(data);
     }
   } catch (error) {
-    next();
+    next(undefined, error);
   }
 };
 
