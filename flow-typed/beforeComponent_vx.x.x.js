@@ -94,7 +94,7 @@ declare module 'Before.component' {
     isExact: boolean,
     params: { [key: string]: ?string },
     url: string,
-    path?: string,
+    path: string,
     sensitive?: boolean,
     strict?: boolean,
     exact?: boolean
@@ -107,7 +107,9 @@ declare module 'Before.component' {
     location: LocationType,
     action: HistoryAction,
     listen(callback: (location: LocationType, action: HistoryAction) => void): () => void,
+    unstable_push(path: string | LocationType, state?: any): void,
     push(path: string | LocationType, state?: any): void,
+    unstable_replace(path: string | LocationType, state?: any): void,
     replace(path: string | LocationType, state?: any): void,
     go(n: number): void,
     goBack(): void,
@@ -137,14 +139,11 @@ declare module 'Before.component' {
   |};
 
   declare type BeforeState = {
-    currentLocation: LocationType,
-    isFetching: boolean,
-    nextLocation: ?LocationType,
-    initialProps: DataType
+    currentLocation: LocationType
   };
 
   declare type BeforeAction = {
-    type: 'start' | 'end',
+    type: 'update-location' | 'update-props-location',
     location: LocationType,
     props?: DataType
   };
@@ -155,7 +154,6 @@ declare module 'Before.component' {
 
   declare type ShouldRenderProps = {
     children: React$Element<FixMeType>,
-    isFetching: boolean,
     location: LocationType
   };
 
