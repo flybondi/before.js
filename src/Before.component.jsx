@@ -218,12 +218,14 @@ export function Before(props: BeforeComponentWithRouterProps) {
   const beforeHistory = useMemo(
     () => ({
       ...history,
+      unstable_location: history.location,
       unstable_push: history.push,
       unstable_replace: history.replace,
       push: createHistoryMethod('push'),
-      replace: createHistoryMethod('replace')
+      replace: createHistoryMethod('replace'),
+      location: currentLocation
     }),
-    [history, createHistoryMethod]
+    [history, createHistoryMethod, currentLocation]
   );
 
   const routeProps = initialProps.current[currentLocation.pathname];
