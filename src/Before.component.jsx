@@ -38,6 +38,8 @@ import { getQueryString } from './utils';
  */
 const getBasePath: (pathname: string) => string = compose(
   head,
+  split('#'),
+  head,
   split('?')
 );
 
