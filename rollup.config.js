@@ -6,10 +6,8 @@ import flow from 'rollup-plugin-flow';
 import bundleSize from 'rollup-plugin-bundle-size';
 import ramda from '@flybondi/rollup-plugin-ramda';
 import pkg from './package.json';
-import { plugin as analyze } from 'rollup-plugin-analyzer';
 import visualizer from 'rollup-plugin-visualizer';
 import filesize from 'rollup-plugin-filesize';
-import progress from 'rollup-plugin-progress';
 
 export default {
   input: 'index.js',
@@ -47,12 +45,10 @@ export default {
   plugins: [
     clean(),
     filesize(),
-    analyze(),
     visualizer({
       filename: './bundle-analysis.html',
       title: pkg.name
     }),
-    progress(),
     flow({ pretty: true }),
     resolve({
       extensions: ['.js', '.jsx', '.mjs'],
