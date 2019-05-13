@@ -36,8 +36,16 @@ export async function ensureReady(
 
   let data;
   if (isClientSide()) {
-    const state = document.getElementById('server-app-state');
-    data = state && JSON.parse(state.textContent);
+    try {
+      const state = document.getElementById('server-app-state');
+      data = state && state.textContent && JSON.parse(state.textContent);
+    } catch (error) {
+      console.error(
+        'There was an error parsing the server-app state',
+        error,
+        document.getElementById('server-app-state')
+      );
+    }
   }
   return Promise.resolve(data);
 }
