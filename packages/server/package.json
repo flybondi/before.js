@@ -1,0 +1,133 @@
+{
+  "name": "@flybondi/before-server",
+  "version": "0.0.0-development",
+  "description": "Enables data fetching with any React SSR app that uses React Router 5",
+  "main": "dist/index.js",
+  "module": "dist/index.es.js",
+  "author": "Flybondi <dev@flybondi.com>",
+  "license": "UNLICENSED",
+  "keywords": [
+    "react",
+    "react ssr",
+    "react-router",
+    "before",
+    "async"
+  ],
+  "scripts": {
+    "build": "cross-env NODE_ENV=production rollup -c",
+    "flow.coverage": "flow coverage",
+    "flow.install": "flow-typed install --ignoreDeps dev",
+    "flow.start": "flow start",
+    "flow.status": "flow status",
+    "flow.stop": "flow stop",
+    "lint": "eslint src/",
+    "prepublishOnly": "yarn build",
+    "prettier": "prettier --write src/",
+    "test.coverage": "yarn test --coverage --coverageDirectory .coverage",
+    "test.watch": "jest --watchAll",
+    "test": "jest"
+  },
+  "peerDependencies": {
+    "@loadable/server": "^5.9.0",
+    "react": ">=16.8",
+    "react-dom": ">= 16.8",
+    "react-helmet": "^5.2.0",
+    "react-router-dom": "^5.0.0"
+  },
+  "dependencies": {
+    "query-string": "6.5.0",
+    "ramda": "^0.26.1",
+    "serialize-javascript": "^1.7.0"
+  },
+  "devDependencies": {
+    "@babel/core": "7.4.4",
+    "@babel/plugin-external-helpers": "^7.2.0",
+    "@babel/preset-flow": "^7.0.0",
+    "@babel/runtime": "7.4.4",
+    "@commitlint/config-conventional": "^7.6.0",
+    "@flybondi/rollup-plugin-ramda": "^1.1.1",
+    "@loadable/component": "5.9.0",
+    "@loadable/server": "5.9.0",
+    "babel-core": "^7.0.0-0",
+    "babel-eslint": "^10.0.1",
+    "babel-jest": "24.8.0",
+    "babel-preset-react-app": "^9.0.0",
+    "commitlint": "^7.6.1",
+    "enzyme": "^3.9.0",
+    "enzyme-adapter-react-16": "1.13.0",
+    "eslint": "5.16.0",
+    "eslint-config-prettier": "^4.2.0",
+    "eslint-config-standard": "^12.0.0",
+    "eslint-plugin-flowtype": "^3.8.2",
+    "eslint-plugin-import": "^2.17.2",
+    "eslint-plugin-node": "^9.0.1",
+    "eslint-plugin-prettier": "^3.1.0",
+    "eslint-plugin-promise": "^4.1.1",
+    "eslint-plugin-ramda": "^2.5.1",
+    "eslint-plugin-react": "^7.13.0",
+    "eslint-plugin-react-hooks": "1.6.0",
+    "eslint-plugin-standard": "^4.0.0",
+    "flow-bin": "0.98.1",
+    "flow-typed": "^2.5.1",
+    "husky": "^2.2.0",
+    "jest": "24.8.0",
+    "lint-staged": "^8.1.6",
+    "npm-run-all": "^4.1.5",
+    "prettier": "^1.17.0",
+    "react": "16.8.6",
+    "react-dom": "16.8.6",
+    "react-helmet": "^5.2.1",
+    "react-router-dom": "5.0.0",
+    "react-testing-library": "7.0.0",
+    "rollup": "1.11.3",
+    "rollup-plugin-babel": "^4.3.2",
+    "rollup-plugin-bundle-size": "^1.0.3",
+    "rollup-plugin-clean": "^1.0.0",
+    "rollup-plugin-commonjs": "9.3.4",
+    "rollup-plugin-filesize": "^6.0.1",
+    "rollup-plugin-flow": "^1.1.1",
+    "rollup-plugin-node-resolve": "^4.2.4",
+    "rollup-plugin-visualizer": "1.1.1",
+    "webpack": "^4.31.0"
+  },
+  "lint-staged": {
+    "src/**/*.{js,json}": [
+      "prettier --write",
+      "eslint --fix",
+      "git add"
+    ]
+  },
+  "husky": {
+    "hooks": {
+      "commit-msg": "commitlint -e $GIT_PARAMS",
+      "pre-commit": "lint-staged",
+      "pre-push": "run-s test"
+    }
+  },
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
+    ]
+  },
+  "jest": {
+    "verbose": true,
+    "collectCoverageFrom": [
+      "src/**/*.{js,jsx,mjs}"
+    ],
+    "transform": {
+      "^.+\\.(js|jsx|mjs)$": "babel-jest",
+      "^(?!.*\\.(js|jsx|mjs|css|json)$)": "<rootDir>/config/file-transform.js"
+    },
+    "transformIgnorePatterns": [
+      "[/\\\\]node_modules[/\\\\].+\\.(js|jsx|mjs)$"
+    ],
+    "setupFilesAfterEnv": [
+      "<rootDir>/config/enzyme.config.js"
+    ],
+    "testEnvironment": "node",
+    "moduleNameMapper": {
+      "\\.css$": "identity-obj-proxy"
+    },
+    "testURL": "http://localhost"
+  }
+}

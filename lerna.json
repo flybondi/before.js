@@ -1,0 +1,17 @@
+{
+  "packages": [
+    "packages/*"
+  ],
+  "publishConfig": {
+    "access": "private"
+  },
+  "command": {
+    "publish": {
+      "npmClient": "yarn",
+      "message": "chore(release): tag new versions [skip ci]"
+    }
+  },
+  "useWorkspaces": true,
+  "npmClient": "yarn",
+  "version": "independent"
+}

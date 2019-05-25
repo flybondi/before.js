@@ -9,11 +9,11 @@ import type { Extractor, PageProps, Renderer, RenderOptions, Request, Route } fr
 import { ChunkExtractor, ChunkExtractorManager } from '@loadable/server';
 import { DocumentComponent as DefaultDoc } from './Document.component';
 import { fetchInitialPropsFromRoute } from './fetchInitialPropsFromRoute';
-import { isError, isPromise } from './utils';
+import { isError, isPromise } from '../../shared/utils';
 import { complement, isEmpty, F } from 'ramda';
 import { StaticRouter } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
-import Before from './Before.component';
+import Before from '../../shared/Before.component';
 import path from 'path';
 import React from 'react';
 import ReactDOMServer from 'react-dom/server';
