@@ -1,8 +1,29 @@
 'use strict';
 
 const React = require('react');
-const { asyncComponent } = require('./Async.component');
 const { fetchInitialPropsFromRoute } = require('./fetchInitialPropsFromRoute');
+
+function dummyAsyncComponent({ LoadableComponent, loader }) {
+  let Component = null;
+  const AsyncRouteComponent = props => {
+    return <LoadableComponent {...props} />;
+  };
+
+  AsyncRouteComponent.load = async () => {
+    const loaderFn = loader.requireAsync || loader;
+    return loaderFn().then(component => {
+      Component = component.default || component;
+      return Component;
+    });
+  };
+
+  AsyncRouteComponent.getInitialProps = async context => {
+    const component = Component || (await AsyncRouteComponent.load());
+    return component.getInitialProps ? component.getInitialProps(context) : Promise.resolve(null);
+  };
+
+  return AsyncRouteComponent;
+}
 
 beforeEach(() => {
   jest.resetModules();
@@ -16,7 +37,7 @@ test('should return an empty object if the pathname is invalid', async () => {
     {
       path: '/',
       exact: true,
-      component: asyncComponent({ loader: mockLoader, LoadableComponent: DummyComponent })
+      component: dummyAsyncComponent({ loader: mockLoader, LoadableComponent: DummyComponent })
     }
   ];
 
@@ -33,7 +54,7 @@ test('should return a Match value but without data', async () => {
     {
       path: '/',
       exact: true,
-      component: asyncComponent({ loader: mockLoader, LoadableComponent: DummyComponent })
+      component: dummyAsyncComponent({ loader: mockLoader, LoadableComponent: DummyComponent })
     },
     {
       path: '/no-match-path'
@@ -60,7 +81,7 @@ test('should load an async component and fetch their initial props', async () =>
     {
       path: '/',
       exact: true,
-      component: asyncComponent({ loader: mockLoader, LoadableComponent: DummyComponent })
+      component: dummyAsyncComponent({ loader: mockLoader, LoadableComponent: DummyComponent })
     },
     {
       path: '/no-match-path'
@@ -243,7 +264,7 @@ test('should not fetch initial props from matched route component', async () => 
     {
       path: '/',
       exact: true,
-      component: asyncComponent({ loader: mockLoader })
+      component: dummyAsyncComponent({ loader: mockLoader })
     },
     {
       path: '/no-match-path'
@@ -316,7 +337,7 @@ test('should throw an error while fetching initial props from matched async rout
     {
       path: '/',
       exact: true,
-      component: asyncComponent({ loader: mockLoader })
+      component: dummyAsyncComponent({ loader: mockLoader })
     },
     {
       path: '/no-match-path'

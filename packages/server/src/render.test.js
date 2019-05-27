@@ -2,8 +2,29 @@
 /* eslint react/prop-types: 0 */
 
 const React = require('react');
-const { asyncComponent } = require('./Async.component');
 const DummyComponent = () => <span>Hi there!</span>;
+
+function dummyAsyncComponent({ LoadableComponent, loader }) {
+  let Component = null;
+  const AsyncRouteComponent = props => {
+    return <LoadableComponent {...props} />;
+  };
+
+  AsyncRouteComponent.load = async () => {
+    const loaderFn = loader.requireAsync || loader;
+    return loaderFn().then(component => {
+      Component = component.default || component;
+      return Component;
+    });
+  };
+
+  AsyncRouteComponent.getInitialProps = async context => {
+    const component = Component || (await AsyncRouteComponent.load());
+    return component.getInitialProps ? component.getInitialProps(context) : Promise.resolve(null);
+  };
+
+  return AsyncRouteComponent;
+}
 
 beforeEach(() => {
   global.window = undefined;
@@ -23,7 +44,7 @@ test('should use the default document', async () => {
     {
       path: '/',
       exact: true,
-      component: asyncComponent({ loader: mockLoader, LoadableComponent: DummyComponent })
+      component: dummyAsyncComponent({ loader: mockLoader, LoadableComponent: DummyComponent })
     }
   ];
   const options = {
@@ -52,7 +73,7 @@ test('should return a 404', async () => {
     {
       path: '**',
       exact: true,
-      component: asyncComponent({ loader: mockLoader, LoadableComponent: DummyComponent })
+      component: dummyAsyncComponent({ loader: mockLoader, LoadableComponent: DummyComponent })
     }
   ];
   const options = {
@@ -78,7 +99,7 @@ test('should redirect to given path', async () => {
     {
       path: '/home',
       exact: true,
-      component: asyncComponent({ loader: mockLoader, LoadableComponent: DummyComponent }),
+      component: dummyAsyncComponent({ loader: mockLoader, LoadableComponent: DummyComponent }),
       redirectTo: '/path-to-redirect'
     }
   ];
@@ -108,7 +129,10 @@ test('should throw an error if can not load route component initial props', asyn
     {
       path: '/home',
       exact: true,
-      component: asyncComponent({ loader: mockLoader, LoadableComponent: InitialPropsComponent }),
+      component: dummyAsyncComponent({
+        loader: mockLoader,
+        LoadableComponent: InitialPropsComponent
+      }),
       redirectTo: '/path-to-redirect'
     }
   ];
@@ -141,7 +165,7 @@ test('should use given Document component', async () => {
     {
       path: '/test',
       exact: true,
-      component: asyncComponent({ loader: mockLoader, LoadableComponent: DummyComponent })
+      component: dummyAsyncComponent({ loader: mockLoader, LoadableComponent: DummyComponent })
     }
   ];
   const options = {

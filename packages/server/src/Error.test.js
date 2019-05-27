@@ -3,7 +3,7 @@
  */
 
 import React from 'react';
-import Error from './Error.component';
+import { Error } from './Error.component';
 import { shallow } from 'enzyme';
 
 test('the rendered component should have an scary face emoticon', () => {

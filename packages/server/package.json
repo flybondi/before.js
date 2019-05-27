@@ -49,6 +49,7 @@
     "@flybondi/rollup-plugin-ramda": "^1.1.2",
     "@loadable/server": "5.9.0",
     "babel-eslint": "^10.0.1",
+    "babel-jest": "^24.8.0",
     "commitlint": "^7.6.1",
     "core-js": "^3.1.2",
     "cross-env": "^5.2.0",
@@ -72,8 +73,11 @@
     "jest": "24.8.0",
     "lint-staged": "^8.1.7",
     "npm-run-all": "^4.1.5",
+    "object-assign": "^4.1.1",
     "prettier": "^1.17.1",
+    "raf": "^3.4.1",
     "react": "16.8.6",
+    "react-app-polyfill": "^1.0.1",
     "react-dom": "^16.8.6",
     "react-helmet": "^5.2.1",
     "react-router-dom": "5.0.0",
@@ -107,24 +111,40 @@
     ]
   },
   "jest": {
-    "verbose": true,
     "collectCoverageFrom": [
-      "src/**/*.{js,jsx,mjs}"
+      "src/**/*.{js,jsx}"
     ],
-    "transform": {
-      "^.+\\.(js|jsx|mjs)$": "babel-jest",
-      "^(?!.*\\.(js|jsx|mjs|css|json)$)": "<rootDir>/config/file-transform.js"
-    },
-    "transformIgnorePatterns": [
-      "[/\\\\]node_modules[/\\\\].+\\.(js|jsx|mjs)$"
+    "setupFiles": [
+      "react-app-polyfill/jsdom"
     ],
     "setupFilesAfterEnv": [
       "<rootDir>/config/enzyme.config.js"
     ],
+    "testMatch": [
+      "<rootDir>/src/**/__tests__/**/*.{js,jsx}",
+      "<rootDir>/src/**/*.{spec,test}.{js,jsx}"
+    ],
     "testEnvironment": "node",
-    "moduleNameMapper": {
-      "\\.css$": "identity-obj-proxy"
+    "transform": {
+      "^.+\\.(js|jsx)$": "babel-jest",
+      "^(?!.*\\.(js|jsx|css|json)$)": "<rootDir>/config/file-transform.js"
     },
-    "testURL": "http://localhost"
+    "transformIgnorePatterns": [
+      "[/\\\\]node_modules[/\\\\].+\\.(js|jsx)$",
+      "^.+\\.module\\.(css|sass|scss)$"
+    ],
+    "modulePaths": [],
+    "moduleNameMapper": {
+      "^.+\\.module\\.(css|sass|scss)$": "identity-obj-proxy"
+    },
+    "moduleFileExtensions": [
+      "web.js",
+      "js",
+      "tsx",
+      "json",
+      "web.jsx",
+      "jsx",
+      "node"
+    ]
   }
 }
