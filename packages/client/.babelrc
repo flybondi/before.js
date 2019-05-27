@@ -3,11 +3,10 @@
     [
       "@babel/preset-env",
       {
-        "useBuiltIns": "usage",
+        "useBuiltIns": false,
         "loose": true,
         "modules": false,
-        "targets": "defaults",
-        "corejs": 3
+        "targets": "defaults"
       }
     ],
     "@babel/preset-flow",
