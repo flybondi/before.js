@@ -26,7 +26,7 @@ export default {
       },
       file: pkg.module,
       format: 'es',
-      name: 'before-server',
+      name: '@before/server',
       sourcemap: false
     }
   ],
@@ -38,7 +38,7 @@ export default {
       title: pkg.name
     }),
     babel({
-      exclude: '**/node_modules/**',
+      exclude: /node_modules/,
       runtimeHelpers: true
     }),
     resolve({

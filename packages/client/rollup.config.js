@@ -18,7 +18,7 @@ export default {
       },
       file: pkg.module,
       format: 'es',
-      name: 'before-client',
+      name: '@before/client',
       sourcemap: false
     }
   ],
@@ -30,7 +30,7 @@ export default {
       title: pkg.name
     }),
     babel({
-      exclude: '**/node_modules/**',
+      exclude: /node_modules/,
       runtimeHelpers: true
     }),
     resolve({
