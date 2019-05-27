@@ -9,7 +9,7 @@ import type {
 } from 'Document.component';
 import React, { Fragment } from 'react';
 import { F, identity, path } from 'ramda';
-import Error from './Error.component';
+import { Error } from './Error.component';
 import serialize from 'serialize-javascript';
 
 const getHeaderTags = (extractor: Extractor) => [

@@ -1,4 +1,25 @@
 {
-  "presets": ["react-app", "@babel/preset-flow"],
-  "retainLines": true
+  "presets": [
+    [
+      "@babel/preset-env",
+      {
+        "useBuiltIns": "usage",
+        "loose": true,
+        "modules": false,
+        "targets": "defaults",
+        "corejs": 3
+      }
+    ],
+    "@babel/preset-flow",
+    [
+      "@babel/preset-react",
+      {
+        "useBuiltIns": false
+      }
+    ]
+  ],
+  "ignore": [
+    "**/node_modules/**"
+  ],
+  "sourceMaps": false
 }

@@ -2,7 +2,7 @@
 import type { AsyncFixMeComponentType, Context, Route } from 'fetchInitialPropsFromRoutes';
 import { matchPath, type Match } from 'react-router-dom';
 import { complement, has, find, isNil } from 'ramda';
-import { getQueryString } from '../../shared/utils';
+import { getQueryString } from './utils';
 
 /**
  * Check if given value is not null or undefined.

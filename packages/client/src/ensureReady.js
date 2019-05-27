@@ -2,7 +2,7 @@
 import type { Route } from 'ensureReady';
 import { matchPath } from 'react-router-dom';
 import { path } from 'ramda';
-import { isClientSide } from '../../shared/utils';
+import { isClientSide } from './utils';
 import { loadableReady } from '@loadable/component';
 
 /**

@@ -1,24 +1,22 @@
-import clean from 'rollup-plugin-clean';
-import resolve from 'rollup-plugin-node-resolve';
 import babel from 'rollup-plugin-babel';
-import commonjs from 'rollup-plugin-commonjs';
-import flow from 'rollup-plugin-flow';
 import bundleSize from 'rollup-plugin-bundle-size';
-import ramda from '@flybondi/rollup-plugin-ramda';
+import clean from 'rollup-plugin-clean';
+import commonjs from 'rollup-plugin-commonjs';
+import peerDepsExternal from 'rollup-plugin-peer-deps-external';
 import pkg from './package.json';
+import ramda from '@flybondi/rollup-plugin-ramda';
+import resolve from 'rollup-plugin-node-resolve';
 import visualizer from 'rollup-plugin-visualizer';
-import filesize from 'rollup-plugin-filesize';
 
 export default {
   input: 'index.js',
   external: [
     'react',
-    'react-dom',
+    'react-dom/server',
     'react-router-dom',
     'react-helmet',
     'path',
-    '@loadable/server',
-    '@loadable/component'
+    '@loadable/server'
   ],
   output: [
     {
@@ -26,42 +24,32 @@ export default {
         react: 'React',
         'react-dom/server': 'ReactDOMServer'
       },
-      file: pkg.main,
-      format: 'cjs',
-      name: 'before.js',
-      sourcemap: 'inline'
-    },
-    {
-      globals: {
-        react: 'React',
-        'react-dom/server': 'ReactDOMServer'
-      },
       file: pkg.module,
       format: 'es',
-      name: 'before.js',
-      sourcemap: 'inline'
+      name: 'before-server',
+      sourcemap: false
     }
   ],
   plugins: [
     clean(),
-    filesize(),
+    peerDepsExternal(),
     visualizer({
       filename: './bundle-analysis.html',
       title: pkg.name
     }),
-    flow({ pretty: true }),
+    babel({
+      exclude: '**/node_modules/**',
+      runtimeHelpers: true
+    }),
     resolve({
+      browser: false,
       extensions: ['.js', '.jsx', '.mjs'],
-      jsnext: true,
-      main: true,
-      browser: true
+      mainFields: ['module'],
+      preferBuiltins: false
     }),
     commonjs({
-      include: '**/node_modules/**'
-    }),
-    babel({
-      runtimeHelpers: true,
-      exclude: '**/node_modules/**'
+      include: /node_modules/,
+      sourceMap: false
     }),
     ramda(),
     bundleSize()

@@ -10,7 +10,7 @@ import React from 'react';
  * @param {object} Props component props
  * @returns {React$Element<'article'>}
  */
-const Error = ({ message, stack }: ErrorProps) => (
+export const Error = ({ message, stack }: ErrorProps) => (
   <article style={{ width: '75%', textAlign: 'center', marginLeft: 'auto', marginRight: 'auto' }}>
     <span
       style={{ fontSize: '120px', display: 'block', width: '100%' }}
@@ -29,5 +29,3 @@ const Error = ({ message, stack }: ErrorProps) => (
     </section>
   </article>
 );
-
-export default Error;
