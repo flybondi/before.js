@@ -18,13 +18,13 @@
     "packages/*"
   ],
   "scripts": {
-    "build": "run-s build.*",
+    "build": "run-s build:*",
     "build:client": "yarn workspace @flybondi/before-client run build",
     "build:server": "yarn workspace @flybondi/before-server run build",
     "flow:utils": "yarn workspace @flybondi/before-client flow.install",
     "flow:ssr-core": "yarn workspace @flybondi/before-server flow.install",
     "flow:all": "run-s flow:*",
-    "format": "prettier --write \"packages/*/!(flow-typed*)/**/*.js\"",
+    "format": "prettier --write \"packages/*/!(flow-typed*|dist*)/**/*.js\"",
     "lint": "run-p lint:*",
     "lint:client": "yarn workspace @flybondi/before-client run lint",
     "lint:server": "yarn workspace @flybondi/before-server run lint",
