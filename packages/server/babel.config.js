@@ -6,7 +6,8 @@ const PRESETS = {
     loose: true,
     // Do not transform modules to CJS
     modules: false,
-    targets: 'node 10'
+    targets: 'node 10',
+    corejs: 3
   },
   test: {
     targets: 'node 10'
