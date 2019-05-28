@@ -9,9 +9,14 @@ beforeEach(() => {
 });
 
 test('should load all routes and retrieve data from context', async () => {
-  jest.doMock('./utils', () => ({
-    isClientSide: jest.fn().mockReturnValue(true)
-  }));
+  jest.doMock('./utils', () => {
+    const utils = jest.requireActual('./utils');
+    return {
+      ...utils,
+      isClientSide: jest.fn().mockReturnValue(true)
+    };
+  });
+
   const DummyComponent = () => <span>Hi there!</span>;
   const mockLoader = jest.fn().mockResolvedValue(DummyComponent);
   const mockRoutes = [
@@ -27,17 +32,21 @@ test('should load all routes and retrieve data from context', async () => {
   global.document = {
     getElementById: jest.fn().mockReturnValue(mockState)
   };
-  const { ensureReady } = require('./ensureReady');
+  const { loadCurrentRoute } = require('./ensureReady');
 
-  const response = await ensureReady(mockRoutes, '/');
+  const response = await loadCurrentRoute(mockRoutes, '/');
   expect(document.getElementById).toHaveBeenCalledWith('server-app-state');
   expect(response).toHaveProperty('test', true);
 });
 
 test('should not retrieve the server-app-state if running on server', async () => {
-  jest.doMock('./utils', () => ({
-    isClientSide: jest.fn().mockReturnValue(false)
-  }));
+  jest.doMock('./utils', () => {
+    const utils = jest.requireActual('./utils');
+    return {
+      ...utils,
+      isClientSide: jest.fn().mockReturnValue(false)
+    };
+  });
   const DummyComponent = () => <span>Hi there!</span>;
   const mockLoader = jest.fn().mockResolvedValue(DummyComponent);
   const mockRoutes = [
@@ -47,16 +56,20 @@ test('should not retrieve the server-app-state if running on server', async () =
       component: asyncComponent({ loader: mockLoader })
     }
   ];
-  const { ensureReady } = require('./ensureReady');
+  const { loadCurrentRoute } = require('./ensureReady');
 
-  const response = await ensureReady(mockRoutes, '/');
+  const response = await loadCurrentRoute(mockRoutes, '/');
   expect(response).toBeUndefined();
 });
 
 test('should get the server-app-state but without loading the route components', async () => {
-  jest.doMock('./utils', () => ({
-    isClientSide: jest.fn().mockReturnValue(true)
-  }));
+  jest.doMock('./utils', () => {
+    const utils = jest.requireActual('./utils');
+    return {
+      ...utils,
+      isClientSide: jest.fn().mockReturnValue(true)
+    };
+  });
   const DummyComponent = () => <span>Hi there!</span>;
   const mockRoutes = [
     {
@@ -76,9 +89,9 @@ test('should get the server-app-state but without loading the route components',
   global.document = {
     getElementById: jest.fn().mockReturnValue(mockState)
   };
-  const { ensureReady } = require('./ensureReady');
+  const { loadCurrentRoute } = require('./ensureReady');
 
-  const response = await ensureReady(mockRoutes, '/');
+  const response = await loadCurrentRoute(mockRoutes, '/');
   expect(document.getElementById).toHaveBeenCalledWith('server-app-state');
   expect(response).toHaveProperty('test', true);
 });

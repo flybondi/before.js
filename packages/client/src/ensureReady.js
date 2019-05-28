@@ -19,12 +19,18 @@ const routeHasComponentLoad = path(['component', 'load']);
  * @param {array} routes an array of async routes
  * @param {string} pathname defaults to window.location.pathname
  */
-async function loadCurrentRoute(routes: Array<Route>, pathname: string = window.location.pathname) {
+export async function loadCurrentRoute(
+  routes: Array<Route>,
+  pathname: string = window.location.pathname
+) {
   let data;
   const route = findRouteByPathname(pathname)(routes);
-  const match = matchPath(pathname, route);
-  if (match && routeHasComponentLoad(route)) {
-    await route.component.load();
+
+  if (route) {
+    const match = matchPath(pathname, route);
+    if (match && routeHasComponentLoad(route)) {
+      await route.component.load();
+    }
   }
 
   if (isClientSide()) {
