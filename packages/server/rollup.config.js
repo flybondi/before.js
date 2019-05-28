@@ -28,6 +28,16 @@ export default {
       format: 'es',
       name: '@before/server',
       sourcemap: false
+    },
+    {
+      globals: {
+        react: 'React',
+        'react-dom/server': 'ReactDOMServer'
+      },
+      file: pkg.main,
+      format: 'cjs',
+      name: '@before/server',
+      sourcemap: false
     }
   ],
   plugins: [
@@ -44,7 +54,6 @@ export default {
     resolve({
       browser: false,
       extensions: ['.js', '.jsx', '.mjs'],
-      mainFields: ['module'],
       preferBuiltins: false
     }),
     commonjs({

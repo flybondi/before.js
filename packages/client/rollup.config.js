@@ -20,6 +20,15 @@ export default {
       format: 'es',
       name: '@before/client',
       sourcemap: false
+    },
+    {
+      globals: {
+        react: 'React'
+      },
+      file: pkg.main,
+      format: 'cjs',
+      name: '@before/client',
+      sourcemap: false
     }
   ],
   plugins: [
@@ -36,7 +45,6 @@ export default {
     resolve({
       browser: true,
       extensions: ['.js', '.jsx', '.mjs'],
-      mainFields: ['module'],
       preferBuiltins: false
     }),
     commonjs({
