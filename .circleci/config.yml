@@ -77,8 +77,6 @@ workflows:
 
       - release-approval:
           type: approval
-          requires:
-            - pre-release
       - release-creation:
           requires:
             - release-approval
