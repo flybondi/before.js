@@ -1,6 +1,6 @@
 {
-  "name": "@flybondi/before-client",
-  "version": "0.0.4-development",
+  "name": "@before.js/client",
+  "version": "0.0.0-development",
   "description": "Enables data fetching with any React SSR app that uses React Router 5",
   "main": "dist/index.js",
   "module": "dist/index.es.js",
