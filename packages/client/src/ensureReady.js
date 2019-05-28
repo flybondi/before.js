@@ -2,7 +2,7 @@
 import type { Route } from 'ensureReady';
 import { matchPath } from 'react-router-dom';
 import { path } from 'ramda';
-import { isClientSide } from './utils';
+import { findRouteByPathname, isClientSide } from './utils';
 import { loadableReady } from '@loadable/component';
 
 /**
@@ -19,32 +19,21 @@ const routeHasComponentLoad = path(['component', 'load']);
  * @param {array} routes an array of async routes
  * @param {string} pathname defaults to window.location.pathname
  */
-export async function ensureReady(
-  routes: Array<Route>,
-  pathname: string = window.location.pathname
-) {
-  await Promise.all(
-    routes.map(route => {
-      const match = matchPath(pathname, route);
-      // $FlowFixMe
-      if (match && routeHasComponentLoad(route)) {
-        return route.component.load();
-      }
-      return undefined;
-    })
-  );
-
+async function loadCurrentRoute(routes: Array<Route>, pathname: string = window.location.pathname) {
   let data;
+  const route = findRouteByPathname(pathname)(routes);
+  const match = matchPath(pathname, route);
+  if (match && routeHasComponentLoad(route)) {
+    await route.component.load();
+  }
+
   if (isClientSide()) {
+    const state = document.getElementById('server-app-state');
+    const textContent = path(['textContent'], state);
     try {
-      const state = document.getElementById('server-app-state');
-      data = state && state.textContent && JSON.parse(state.textContent);
+      data = textContent && JSON.parse(textContent);
     } catch (error) {
-      console.error(
-        'There was an error parsing the server-app state',
-        error,
-        document.getElementById('server-app-state')
-      );
+      console.error('There was an error parsing the server-app state', error, textContent);
     }
   }
   return Promise.resolve(data);
@@ -56,6 +45,9 @@ export async function ensureReady(
  * @param {function} rootFn a react mount root function
  * @returns {Promise}
  */
-export function ensureClientReady(rootFn: () => void) {
-  return loadableReady(rootFn);
+export function ensureReady(
+  routes: Array<Route>,
+  rootFn: (data: ?{ [key: string]: string }) => void
+) {
+  return loadableReady(() => loadCurrentRoute(routes).then(rootFn));
 }

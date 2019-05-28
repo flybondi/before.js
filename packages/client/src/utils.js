@@ -1,7 +1,9 @@
 // @flow strict
 import { parse } from 'query-string';
-import { complement } from 'ramda';
+import { matchPath } from 'react-router-dom';
+import { complement, find, isNil } from 'ramda';
 import type { QueryType } from 'Before.component';
+import type { Route } from 'ensureReady';
 
 /**
  * Check if current execution belongs to a server.
@@ -30,3 +32,27 @@ export const getQueryString = (
   { search }: { search: string } = {},
   { query }: { query: QueryType } = {}
 ) => (isClientSide() ? parse(search) : query);
+
+/**
+ * Check if given value is not null or undefined.
+ * @func
+ * @param {any} value
+ * @returns {boolean}
+ */
+const isNotNil = complement(isNil);
+
+/**
+ * Returns a function that check if given route match with given request pathname.
+ * @func
+ * @param {string} pathname a request pathname
+ * @returns {function} (route) => boolean
+ */
+const checkMatchPath = (pathname: string) => (route: Route) => isNotNil(matchPath(pathname, route));
+
+/**
+ * Returns a function that will find a route by a given request pathname.
+ * @func
+ * @param {string} pathname a request pathname
+ * @returns {function} (routes[]) => route
+ */
+export const findRouteByPathname = (pathname: string) => find(checkMatchPath(pathname));

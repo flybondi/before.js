@@ -1,32 +1,8 @@
 // @flow strict
 import type { AsyncFixMeComponentType, Context, Route } from 'fetchInitialPropsFromRoutes';
 import { matchPath, type Match } from 'react-router-dom';
-import { complement, has, find, isNil } from 'ramda';
-import { getQueryString } from './utils';
-
-/**
- * Check if given value is not null or undefined.
- * @func
- * @param {any} value
- * @returns {boolean}
- */
-const isNotNil = complement(isNil);
-
-/**
- * Returns a function that check if given route match with given request pathname.
- * @func
- * @param {string} pathname a request pathname
- * @returns {function} (route) => boolean
- */
-const checkMatchPath = (pathname: string) => (route: Route) => isNotNil(matchPath(pathname, route));
-
-/**
- * Returns a function that will find a route by a given request pathname.
- * @func
- * @param {string} pathname a request pathname
- * @returns {function} (routes[]) => route
- */
-const findRouteByPathname = (pathname: string) => find(checkMatchPath(pathname));
+import { has } from 'ramda';
+import { findRouteByPathname, getQueryString, isNotNil } from './utils';
 
 /**
  * Check if the `getInitialProps` property exist in given object.
