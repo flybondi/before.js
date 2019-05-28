@@ -77,6 +77,9 @@ workflows:
 
       - release-approval:
           type: approval
+          filters:
+            branches:
+              only: develop
           requires:
             - health-check
       - release-creation:
