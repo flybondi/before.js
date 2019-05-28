@@ -3,6 +3,7 @@
 </p>
 <h1 align="center">Before.js</h1>
 
+[![js-flybondi](https://img.shields.io/badge/flybondi-fdbe15.svg?logo=javascript&style=flat-square&logoColor=grey&logoWidth=20)](https://flybondi.com)
 ![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg) ![js-semistandard-style](https://img.shields.io/badge/code%20style-semistandard-brightgreen.svg?style=flat) ![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat) ![CircleCI](https://circleci.com/gh/flybondi/before.js.svg?style=shield&circle-token=4ba6f16c2f14514e0b638a89142b5056cf1aa9a9)
 
 **Table of Contents**
