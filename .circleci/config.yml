@@ -9,7 +9,7 @@
 
 job_defaults: &job_defaults
   docker:
-    - image: flybondi/docker-nodejs-awscli:8.10
+    - image: flybondi/docker-nodejs-awscli:10.x
 
 npm_config: &npm_config
   name: Configure NPM user
@@ -32,28 +32,8 @@ jobs:
           paths:
             - ./node_modules
       - run:
-          name: Running tests
-          command: yarn test
-
-  pre-release:
-    <<: *job_defaults
-    steps:
-      - checkout
-      - run: *npm_config
-      - run:
-          name: Install deps
-          command: yarn install --pure-lockfile
-      - deploy:
-          name: Create pre-release and publish it to @next in npm
-          command: |
-            git config --global user.email $GIT_EMAIL
-            git config --global user.name $GIT_USERNAME
-            VER=$(npm dist-tags ls | grep next | cut -d ' ' -f 2)
-            jq ".version=\"$VER\"" < package.json > package2.json
-            mv package2.json package.json
-            git commit package.json -m "mock pck version"
-            npm version prerelease
-            npm publish --tag next
+          name: Running tests and lint
+          command: yarn test lint
   release-creation:
     <<: *job_defaults
     steps:
@@ -80,9 +60,10 @@ jobs:
           name: Install deps
           command: yarn install --pure-lockfile
       - deploy:
-          name: Semantic release
-          command: npx -p @flybondi/semantic-release-packages-config@$SEMANTIC_PKGS_VERSION -p semantic-release@$SEMANTIC_VERSION semantic-release -e @flybondi/semantic-release-packages-config
-
+          name: Lerna release
+          command: |
+            yarn lerna version --conventional-commits --changelog-preset angular --yes
+            yarn lerna publish from-package --npm-tag latest --yes
 workflows:
   version: 2
   packages-flow:
@@ -93,17 +74,14 @@ workflows:
               ignore:
                 - master
           context: flybondi-ci
-      - pre-release:
-          requires:
-            - health-check
+
+      - release-approval:
+          type: approval
           filters:
             branches:
               only: develop
-          context: flybondi-ci
-      - release-approval:
-          type: approval
           requires:
-            - pre-release
+            - health-check
       - release-creation:
           requires:
             - release-approval
@@ -113,3 +91,4 @@ workflows:
             branches:
               only: master
           context: flybondi-ci
+
