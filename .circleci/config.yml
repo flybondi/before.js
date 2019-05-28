@@ -9,7 +9,7 @@
 
 job_defaults: &job_defaults
   docker:
-    - image: flybondi/docker-nodejs-awscli:8.10
+    - image: flybondi/docker-nodejs-awscli:10.x
 
 npm_config: &npm_config
   name: Configure NPM user
@@ -34,33 +34,6 @@ jobs:
       - run:
           name: Running tests and lint
           command: yarn test lint
-  pre-release:
-    <<: *job_defaults
-    steps:
-      - checkout
-      - run: *npm_config
-      - run:
-          name: Install deps
-          command: yarn install --pure-lockfile
-      - deploy:
-          name: Create pre-releases and publish then as @next in npm
-          command: |
-            git config --global user.email $GIT_EMAIL
-            git config --global user.name $GIT_USERNAME
-            for i in $(git diff $CIRCLE_SHA1 $CIRCLE_SHA1^ --name-only | awk '/'packages'/ {split($0, r, "/"); print r[2]}' | uniq); do
-                cd packages/$i
-                VER=$(npm dist-tags ls | grep next | cut -d ' ' -f 2)
-                jq ".version=\"$VER\"" < package.json > package-temp.json
-                NAME=$(jq .name package.json -r)
-                mv package-temp.json package.json
-                git commit package.json -m "chore(prerelease) $NAME"
-                npm version prerelease
-                npm publish --tag next
-                PREVER=$(jq .version package.json -r)
-                git tag prerelease-$NAME-$PREVER
-                git push origin prerelease-$NAME-$PREVER
-                cd ../..
-            done;
   release-creation:
     <<: *job_defaults
     steps:
@@ -100,13 +73,6 @@ workflows:
             branches:
               ignore:
                 - master
-          context: flybondi-ci
-      - pre-release:
-          requires:
-            - health-check
-          filters:
-            branches:
-              only: develop
           context: flybondi-ci
 
       - release-approval:
