@@ -2,7 +2,8 @@
 
 const PRESETS = {
   production: {
-    useBuiltIns: false,
+    useBuiltIns: 'usage',
+    corejs: 3,
     loose: true,
     // Do not transform modules to CJS
     modules: false,
