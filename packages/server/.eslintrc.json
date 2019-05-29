@@ -1,0 +1,28 @@
+{
+  "parser": "babel-eslint",
+  "plugins": ["flowtype", "ramda", "react", "react-hooks"],
+  "extends": [
+    "standard",
+    "plugin:flowtype/recommended",
+    "plugin:react/recommended",
+    "plugin:ramda/recommended",
+    "plugin:prettier/recommended"
+  ],
+  "env": {
+    "node": true,
+    "jest": true,
+    "browser": true
+  },
+  "settings": {
+    "react": {
+      "version": ">= 16"
+    }
+  },
+  "rules": {
+    "semi": [2, "always"],
+    "no-extra-semi": 2,
+    "react/display-name": 0,
+    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": "warn"
+  }
+}
