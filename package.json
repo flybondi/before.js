@@ -1,9 +1,5 @@
 {
   "name": "@flybondi/before.js",
-  "version": "0.0.0-development",
-  "description": "Enables data fetching with any React SSR app that uses React Router 5",
-  "main": "dist/index.js",
-  "module": "dist/index.es.js",
   "author": "Flybondi <dev@flybondi.com>",
   "license": "UNLICENSED",
   "private": true,
@@ -59,7 +55,7 @@
     "@commitlint/config-conventional": "^7.5.0",
     "commitlint": "^7.5.2",
     "husky": "^2.3.0",
-    "lerna": "^3.6.0",
+    "lerna": "^3.14.1",
     "lint-staged": "^8.1.5"
   }
 }
