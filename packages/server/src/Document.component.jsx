@@ -13,7 +13,6 @@ import { Error } from './Error.component';
 import serialize from 'serialize-javascript';
 
 const getHeaderTags = (extractor: Extractor) => [
-  ...extractor.getScriptElements(),
   ...extractor.getStyleElements(),
   ...extractor.getLinkElements()
 ];
@@ -69,6 +68,7 @@ export function DocumentComponent({
             <Data data={filterServerData(data)} />
           </Fragment>
         )}
+        {extractor && extractor.getScriptElements()}
         {extraBodyTags.map(renderTags)}
       </body>
     </html>
@@ -90,12 +90,15 @@ DocumentComponent.getInitialProps = async ({
 
 export const Root = () => <div id="root">BEFORE.JS-DATA</div>;
 
-export const Data = ({ data }: { data: DataType }) => (
-  <script
-    id="server-app-state"
-    type="application/json"
-    dangerouslySetInnerHTML={{
-      __html: serialize({ ...data }).replace(/<\/script>/g, '%3C/script%3E')
-    }}
-  />
-);
+export const Data = ({ data }: { data: DataType }) => {
+  return (
+    <script
+      key={Math.random()}
+      id="server-app-state"
+      type="application/json"
+      dangerouslySetInnerHTML={{
+        __html: serialize(data, { isJSON: true }).replace(/<\/script>/g, '%3C/script%3E')
+      }}
+    />
+  );
+};
