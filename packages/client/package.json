@@ -25,6 +25,7 @@
     "flow.status": "flow status",
     "flow.stop": "flow stop",
     "lint": "eslint src/",
+    "prepublishOnly": "yarn build",
     "test.coverage": "yarn test --coverage --coverageDirectory .coverage",
     "test.watch": "jest --watchAll",
     "test": "jest"
