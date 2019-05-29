@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.0.1](https://github.com/flybondi/before.js/compare/v5.0.0-development.0...v4.0.1) (2019-05-29)
+
+
+### Bug Fixes
+
+* set packages version to 4.0.0 ([#30](https://github.com/flybondi/before.js/issues/30)) ([d4c7f96](https://github.com/flybondi/before.js/commit/d4c7f96))
+
+
+
+
+
 # [5.0.0-development.0](https://github.com/flybondi/before.js/compare/v3.3.0...v5.0.0-development.0) (2019-05-29)
 
 
