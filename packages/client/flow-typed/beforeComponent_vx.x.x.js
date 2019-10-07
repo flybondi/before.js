@@ -164,7 +164,8 @@ declare module 'Before.component' {
     +staticContext?: StaticRouterContext,
     +data: ?DataType,
     +routes: Array<AsyncRoute>,
-    +req: Request
+    +req: Request,
+    +disableInitialPropsCache: Boolean
   |};
 
   declare module.exports: {
