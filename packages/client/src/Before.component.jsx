@@ -146,7 +146,7 @@ const reducer = (state: BeforeState, { location, type }: BeforeAction) => {
  * @function
  */
 export function Before(props: BeforeComponentWithRouterProps) {
-  const { data, routes, location, req, history } = props;
+  const { data, routes, location, req, history, disableInitialPropsCache } = props;
   const [state, dispatch] = useReducer(reducer, {
     currentLocation: location
   });
@@ -192,7 +192,7 @@ export function Before(props: BeforeComponentWithRouterProps) {
   useEffect(() => {
     const unlisten = history.listen((location, action) => {
       interrupt.current = action === 'POP';
-      if (!initialProps.current[location.pathname]) {
+      if (disableInitialPropsCache || !initialProps.current[location.pathname]) {
         // This solves a weird case when, on an advanced step of the flow, the user does a browser back
         const route = getRouteByPathname(location.pathname, routes);
         if (route) {
