@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.1.0](https://github.com/flybondi/before.js/compare/v4.0.2...v4.1.0) (2019-10-07)
+
+
+### Bug Fixes
+
+* add missing flow types ([#33](https://github.com/flybondi/before.js/issues/33)) ([bdaa459](https://github.com/flybondi/before.js/commit/bdaa459))
+
+
+
+
+
 ## [4.0.1](https://github.com/flybondi/before.js/compare/v5.0.0-development.0...v4.0.1) (2019-05-29)
 
 
