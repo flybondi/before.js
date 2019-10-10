@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.1.1](https://github.com/flybondi/before.js/compare/v4.1.0...v4.1.1) (2019-10-10)
+
+
+### Bug Fixes
+
+* change extra scripts order and add style tag ([#34](https://github.com/flybondi/before.js/issues/34)) ([3ccf975](https://github.com/flybondi/before.js/commit/3ccf975))
+
+
+
+
+
 # [4.1.0](https://github.com/flybondi/before.js/compare/v4.0.2...v4.1.0) (2019-10-07)
 
 
