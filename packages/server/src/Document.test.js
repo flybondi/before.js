@@ -21,6 +21,9 @@ test('should render the server-app-state', () => {
       script: {
         toComponent: jest.fn()
       },
+      style: {
+        toComponent: jest.fn()
+      },
       htmlAttributes: {
         toComponent: jest.fn()
       },
@@ -65,6 +68,9 @@ test('should filter the server-app-state with the given function', () => {
         toComponent: jest.fn()
       },
       script: {
+        toComponent: jest.fn()
+      },
+      style: {
         toComponent: jest.fn()
       },
       htmlAttributes: {
@@ -134,6 +140,9 @@ test('should render the extra html tags in the `head`', () => {
         toComponent: jest.fn()
       },
       script: {
+        toComponent: jest.fn()
+      },
+      style: {
         toComponent: jest.fn()
       },
       htmlAttributes: {
