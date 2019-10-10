@@ -49,11 +49,12 @@ export function DocumentComponent({
         {helmet.title.toComponent()}
         {helmet.meta.toComponent()}
         {helmet.link.toComponent()}
+        {extraHeadTags.map(renderTags)}
+        {helmet.style.toComponent()}
         {helmet.script.toComponent()}
         {extractor && getHeaderTags(extractor)}
         {criticalCSS !== false && criticalCSS}
         {clientCss && <link rel="stylesheet" href={clientCss} />}
-        {extraHeadTags.map(renderTags)}
       </head>
       <body {...bodyAttrs}>
         {error ? (
