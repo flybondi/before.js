@@ -37,7 +37,7 @@
     "react-router-dom": "^5.0.0"
   },
   "dependencies": {
-    "query-string": "6.5.0",
+    "query-string": "6.9.0",
     "ramda": "^0.26.1"
   },
   "devDependencies": {
@@ -49,6 +49,8 @@
     "@babel/runtime": "7.4.5",
     "@flybondi/rollup-plugin-ramda": "^1.1.2",
     "@loadable/component": "5.10.1",
+    "@rollup/plugin-node-resolve": "^6.0.0",
+    "@rollup/pluginutils": "^3.0.0",
     "babel-eslint": "^10.0.1",
     "babel-jest": "^24.8.0",
     "commitlint": "^7.6.1",
@@ -79,12 +81,11 @@
     "react-app-polyfill": "^1.0.1",
     "react-dom": "^16.8.6",
     "react-router-dom": "5.0.0",
-    "rollup": "^1.12.4",
+    "rollup": "^1.27.13",
     "rollup-plugin-babel": "^4.3.2",
     "rollup-plugin-bundle-size": "^1.0.3",
     "rollup-plugin-clean": "^1.0.0",
     "rollup-plugin-commonjs": "10.0.0",
-    "rollup-plugin-node-resolve": "^5.0.0",
     "rollup-plugin-peer-deps-external": "^2.2.0",
     "rollup-plugin-visualizer": "1.1.1"
   },
