@@ -18,6 +18,7 @@ export function asyncComponent({ LoadableComponent, loader }: AsyncOptions) {
   };
 
   AsyncRouteComponent.load = async (): Promise<ComponentType<AsyncProps>> => {
+    // NOTE(lf): adding the bind because of this: https://github.com/gregberge/loadable-components/issues/474
     const loaderFn = (loader.requireAsync || loader).bind(loader);
 
     loaderFn.isReady = loader.isReady ? loader.isReady.bind(loader) : F;
