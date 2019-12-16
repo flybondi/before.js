@@ -5,7 +5,7 @@ import commonjs from 'rollup-plugin-commonjs';
 import peerDepsExternal from 'rollup-plugin-peer-deps-external';
 import pkg from './package.json';
 import ramda from '@flybondi/rollup-plugin-ramda';
-import resolve from 'rollup-plugin-node-resolve';
+import resolve from '@rollup/plugin-node-resolve';
 import visualizer from 'rollup-plugin-visualizer';
 
 export default {
