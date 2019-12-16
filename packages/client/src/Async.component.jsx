@@ -1,6 +1,7 @@
 // @flow strict
 import type { AsyncOptions, AsyncProps, ComponentType, Context } from 'Async.component';
 import React from 'react';
+import { F } from 'ramda';
 
 /**
  * Returns a new React component, ready to be instantiated.
@@ -17,9 +18,13 @@ export function asyncComponent({ LoadableComponent, loader }: AsyncOptions) {
   };
 
   AsyncRouteComponent.load = async (): Promise<ComponentType<AsyncProps>> => {
-    const loaderFn = loader.requireAsync || loader;
+    const loaderFn = (loader.requireAsync || loader).bind(loader);
+
+    loaderFn.isReady = loader.isReady ? loader.isReady.bind(loader) : F;
+
     return loaderFn().then(component => {
       Component = component.default || component;
+
       return Component;
     });
   };
