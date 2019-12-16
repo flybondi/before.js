@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.1.2](https://github.com/flybondi/before.js/compare/v4.1.1...v4.1.2) (2019-12-16)
+
+
+### Bug Fixes
+
+* support latest [@loadable](https://github.com/loadable) version ([#35](https://github.com/flybondi/before.js/issues/35)) ([3a77b99](https://github.com/flybondi/before.js/commit/3a77b99dc9c3a47e26da47fb66ea0e4f6f1017f4))
+
+
+
+
+
 ## [4.1.1](https://github.com/flybondi/before.js/compare/v4.1.0...v4.1.1) (2019-10-10)
 
 
