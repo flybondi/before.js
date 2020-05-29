@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 4.1.9 (2020-05-29)
+
+**Note:** Version bump only for package @before.js/client
+
+
+
+
+
 ## 4.1.8 (2020-05-29)
 
 **Note:** Version bump only for package @before.js/client
