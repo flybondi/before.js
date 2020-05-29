@@ -1,7 +1,7 @@
 // @flow strict
 import { parse } from 'query-string';
 import { matchPath } from 'react-router-dom';
-import { complement, find, isNil } from 'ramda';
+import { complement, find, isNil, curry } from 'ramda';
 import type { QueryType } from 'Before.component';
 import type { Route } from 'ensureReady';
 
@@ -51,8 +51,11 @@ const checkMatchPath = (pathname: string) => (route: Route) => isNotNil(matchPat
 
 /**
  * Returns a function that will find a route by a given request pathname.
- * @func
+ * @function
  * @param {string} pathname a request pathname
- * @returns {function} (routes[]) => route
+ * @param {Array<Route>} routes a list of routes
+ * @returns {Route} the route matched with the pathname or undefined
  */
-export const findRouteByPathname = (pathname: string) => find(checkMatchPath(pathname));
+export const findRouteByPathname = curry((pathname: string, routes: Array<Route>) =>
+  find(checkMatchPath(pathname), routes)
+);

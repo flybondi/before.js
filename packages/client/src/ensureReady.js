@@ -24,7 +24,7 @@ export async function loadCurrentRoute(
   pathname: string = window.location.pathname
 ) {
   let data;
-  const route = findRouteByPathname(pathname)(routes);
+  const route = findRouteByPathname(pathname, routes);
 
   if (route) {
     const match = matchPath(pathname, route);
