@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 4.1.7 (2020-05-29)
+
+
+### Reverts
+
+* change release workflow npm login ([154229a](https://github.com/flybondi/before.js/commit/154229ad01d45885d32078dad4c60d7fc1d4be0b))
+
+
+
+
+
 ## 4.1.6 (2020-05-29)
 
 **Note:** Version bump only for package @before.js/server
