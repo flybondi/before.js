@@ -18,6 +18,7 @@ jobs:
       - name: Install deps
         uses: borales/actions-yarn@v2.1.0
         with:
+          auth-token: ${{ secrets.NPM_TOKEN }}
           cmd: install --pure-lockfile # will run `yarn install` command
       - name: Lerna release
         env:
@@ -25,8 +26,6 @@ jobs:
           GIT_AUTHOR_EMAIL: ${{ secrets.GIT_EMAIL }}
           GIT_COMMITTER_NAME: ${{ secrets.GIT_USERNAME }}
           GIT_COMMITTER_EMAIL: ${{ secrets.GIT_EMAIL }}
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
-          echo "//registry.npmjs.org/:_authToken=$NODE_AUTH_TOKEN" > ~/.npmrc
           yarn lerna version --conventional-commits --changelog-preset angular --yes
           yarn lerna publish from-package --dist-tag latest --yes
