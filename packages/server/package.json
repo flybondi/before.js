@@ -1,6 +1,6 @@
 {
   "name": "@before.js/server",
-  "version": "4.1.3",
+  "version": "4.1.4",
   "description": "Enables data fetching with any React SSR app that uses React Router 5",
   "main": "dist/index.js",
   "module": "dist/index.es.js",
