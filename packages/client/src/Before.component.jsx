@@ -12,22 +12,8 @@ import type {
 } from 'Before.component';
 import React, { useCallback, useEffect, useReducer, useRef, useMemo, memo } from 'react';
 import { withRouter, Switch, Route, type ContextRouter } from 'react-router-dom';
-import {
-  compose,
-  concat,
-  find,
-  has,
-  head,
-  ifElse,
-  identity,
-  last,
-  propOr,
-  prop,
-  propEq,
-  split,
-  useWith
-} from 'ramda';
-import { getQueryString } from './utils';
+import { compose, concat, has, head, ifElse, last, propOr, prop, split } from 'ramda';
+import { getQueryString, findRouteByPathname } from './utils';
 
 /**
  * Extract the base path from given full pathname, for example given the following url `/foo?bar=2`
@@ -36,12 +22,7 @@ import { getQueryString } from './utils';
  * @param {string} pathname the pathname to retrieve the pathname
  * @returns {string} the base path
  */
-const getBasePath: (pathname: string) => string = compose(
-  head,
-  split('#'),
-  head,
-  split('?')
-);
+const getBasePath: (pathname: string) => string = compose(head, split('#'), head, split('?'));
 
 /**
  * Extract the search part of a given full pathname or window.Location, for example given the following url `/foo?bar=2`
@@ -53,27 +34,8 @@ const getBasePath: (pathname: string) => string = compose(
 const getSearch: (pathname: string | LocationType) => string = ifElse(
   has('search'),
   prop('search'),
-  compose(
-    concat('?'),
-    last,
-    split('?')
-  )
+  compose(concat('?'), last, split('?'))
 );
-
-/**
- * Retrieve the current route by a given path.
- * @func
- * @param {string} pathname
- * @param {array} routes an array of route to filter
- * @returs {object|undefined} a valid route
- **/
-const getRouteByPathname: (path: string, routes: Array<AsyncRoute>) => ?AsyncRoute = useWith(find, [
-  compose(
-    propEq('path'),
-    getBasePath
-  ),
-  identity
-]);
 
 /**
  * Generates a random string
@@ -156,8 +118,8 @@ export function Before(props: BeforeComponentWithRouterProps) {
 
   const createHistoryMethod = useCallback(
     (name: string) => (obj: string | LocationType, state?: { [key: string]: string }) => {
-      const path: string = propOr(obj, 'pathname', obj);
-      const route = getRouteByPathname(path, routes);
+      const path: string = getBasePath(propOr(obj, 'pathname', obj));
+      const route = findRouteByPathname(path, routes);
       if (route) {
         const search = getSearch(obj);
         fetchInitialProps(
@@ -194,7 +156,7 @@ export function Before(props: BeforeComponentWithRouterProps) {
       interrupt.current = action === 'POP';
       if (disableInitialPropsCache || !initialProps.current[location.pathname]) {
         // This solves a weird case when, on an advanced step of the flow, the user does a browser back
-        const route = getRouteByPathname(location.pathname, routes);
+        const route = findRouteByPathname(location.pathname, routes);
         if (route) {
           fetchInitialProps(
             route,
