@@ -1,7 +1,7 @@
 {
   "name": "@flybondi/before.js",
   "author": "Flybondi <dev@flybondi.com>",
-  "license": "UNLICENSED",
+  "license": "MIT",
   "private": true,
   "keywords": [
     "react",
