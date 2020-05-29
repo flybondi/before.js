@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 4.1.10 (2020-05-29)
+
+
+### Bug Fixes
+
+* use react-router match route method ([#36](https://github.com/flybondi/before.js/issues/36)) ([0d51166](https://github.com/flybondi/before.js/commit/0d51166a2cd62f489676ccbb2ffb48420fbdd17a))
+
+
+
+
+
 ## 4.1.9 (2020-05-29)
 
 **Note:** Version bump only for package @before.js/client
