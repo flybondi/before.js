@@ -16,12 +16,18 @@ jobs:
         uses: borales/actions-yarn@v2.1.0
         with:
           cmd: install --pure-lockfile
-      - name: Jest
+      - name: Jest @client
         uses: mattallty/jest-github-action@v1.0.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           test-command: yarn workspace @before.js/client run test
+      - name: Jest @server
+        uses: mattallty/jest-github-action@v1.0.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          test-command: yarn workspace @before.js/server run test
 
   eslint:
     name: Lint
