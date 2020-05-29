@@ -18,10 +18,5 @@ test('should render with given message and stack', () => {
   );
   const section = wrapper.find('section');
   expect(section.find('strong').text()).toEqual('test message');
-  expect(
-    section
-      .find('p')
-      .last()
-      .text()
-  ).toEqual('test stack');
+  expect(section.find('p').last().text()).toEqual('test stack');
 });

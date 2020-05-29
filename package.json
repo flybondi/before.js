@@ -1,7 +1,7 @@
 {
   "name": "@flybondi/before.js",
   "author": "Flybondi <dev@flybondi.com>",
-  "license": "UNLICENSED",
+  "license": "MIT",
   "private": true,
   "keywords": [
     "react",
@@ -38,12 +38,10 @@
   "lint-staged": {
     "packages/**/src/**/*.{js,jsx}": [
       "prettier --write",
-      "eslint --fix",
-      "git add"
+      "eslint --fix"
     ],
     "packages/**/src/**/*.json": [
-      "prettier --write",
-      "git add"
+      "prettier --write"
     ]
   },
   "commitlint": {
@@ -52,10 +50,10 @@
     ]
   },
   "devDependencies": {
-    "@commitlint/config-conventional": "^7.5.0",
-    "commitlint": "^7.5.2",
-    "husky": "^2.3.0",
-    "lerna": "^3.14.1",
-    "lint-staged": "^8.1.5"
+    "@commitlint/config-conventional": "^8.3.4",
+    "commitlint": "^8.3.5",
+    "husky": "^4.2.5",
+    "lerna": "^3.22.0",
+    "lint-staged": "^10.2.7"
   }
 }

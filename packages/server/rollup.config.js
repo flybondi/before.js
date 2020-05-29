@@ -15,6 +15,7 @@ export default {
     'react-dom/server',
     'react-router-dom',
     'react-helmet',
+    'crypto',
     'path',
     '@loadable/server'
   ],
