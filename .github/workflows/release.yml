@@ -27,5 +27,6 @@ jobs:
           GIT_COMMITTER_EMAIL: ${{ secrets.GIT_EMAIL }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
+          echo "//registry.npmjs.org/:_authToken=$NODE_AUTH_TOKEN" > ~/.npmrc
           yarn lerna version --conventional-commits --changelog-preset angular --yes
-          yarn lerna publish from-package --npm-tag latest --yes
+          yarn lerna publish from-package --dist-tag latest --yes
