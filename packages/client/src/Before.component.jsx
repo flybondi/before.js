@@ -11,7 +11,7 @@ import type {
   ShouldRenderProps
 } from 'Before.component';
 import React, { useCallback, useEffect, useReducer, useRef, useMemo, memo } from 'react';
-import { withRouter, Switch, Route, type ContextRouter } from 'react-router-dom';
+import { withRouter, Switch, Route, type ContextRouter, matchPath } from 'react-router-dom';
 import { compose, concat, has, head, ifElse, last, propOr, prop, split } from 'ramda';
 import { getQueryString, findRouteByPathname } from './utils';
 
@@ -42,10 +42,7 @@ const getSearch: (pathname: string | LocationType) => string = ifElse(
  * @func
  * @retuns {string} the generated key
  **/
-const createLocationKey = () =>
-  Math.random()
-    .toString(36)
-    .substr(2, 5);
+const createLocationKey = () => Math.random().toString(36).substr(2, 5);
 
 /**
  * Inject querystring into the react-router match object
@@ -126,18 +123,19 @@ export function Before(props: BeforeComponentWithRouterProps) {
           route,
           {
             ...props,
-            location: { pathname: route.path, hash: '', search, state },
+            match: matchPath(path, route),
+            location: { pathname: path, hash: '', search, state },
             query: getQueryString({ search })
           },
           props => {
             if (!interrupt.current) {
-              initialProps.current[route.path] = props;
+              initialProps.current[path] = props;
               dispatch({
                 type: 'update-location',
                 location: {
                   hash: '',
                   key: `before-${createLocationKey()}`,
-                  pathname: route.path,
+                  pathname: path,
                   search,
                   state
                 }
@@ -160,9 +158,14 @@ export function Before(props: BeforeComponentWithRouterProps) {
         if (route) {
           fetchInitialProps(
             route,
-            { ...props, location, query: getQueryString(location) },
+            {
+              ...props,
+              match: matchPath(location.pathname, route),
+              location,
+              query: getQueryString(location)
+            },
             props => {
-              initialProps.current[route.path] = props;
+              initialProps.current[location.pathname] = props;
               dispatch({ type: 'update-location', location });
               interrupt.current = false;
             }
