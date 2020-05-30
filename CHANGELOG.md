@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 4.1.11 (2020-05-30)
+
+
+### Bug Fixes
+
+* **client:** make sure the route match is added to the context ([#42](https://github.com/flybondi/before.js/issues/42)) ([7e713c8](https://github.com/flybondi/before.js/commit/7e713c8bc40af0ea3c1f52f77395ff17e48ec7a7))
+
+
+
+
+
 ## 4.1.10 (2020-05-29)
 
 
